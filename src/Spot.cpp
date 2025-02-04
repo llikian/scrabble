@@ -1,4 +1,13 @@
+/***************************************************************************************************
+ * @file  Spot.cpp
+ * @brief Implementation of the Spot struct
+ **************************************************************************************************/
+
 #include "Spot.hpp"
+
+Spot::Spot() : letter(0) { }
+
+Spot::Spot(unsigned char lf, unsigned char wf) : letter(0), bonus(lf, wf) { }
 
 //display of the spot contents
 std::ostream& operator <<(std::ostream& out, Spot s) {

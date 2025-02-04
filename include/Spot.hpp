@@ -1,3 +1,8 @@
+/***************************************************************************************************
+ * @file  Spot.hpp
+ * @brief Declaration of the Spot struct
+ **************************************************************************************************/
+
 #pragma once
 
 #include "Bonus.hpp"
@@ -8,14 +13,12 @@
 
 struct Spot {
     //default initialization, no letter, no bonus
-    Spot() :
-        letter(0) { }
+    Spot();
 
     //bonus spot initialization
     // * lf is the bonus letter factor
     // * wf is the bonus word factor
-    Spot(unsigned char lf, unsigned char wf) :
-        letter(0), bonus(lf, wf) { }
+    Spot(unsigned char lf, unsigned char wf);
 
     //the letter placed on the spot, 0 if none
     char letter;
