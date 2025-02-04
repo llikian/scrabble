@@ -2,9 +2,6 @@
 cmake_minimum_required(VERSION 3.26)
 project(Scrabble)
 
-# Find packages
-
-
 # Compiler options
 set(CMAKE_CXX_STANDARD 23)
 
@@ -18,7 +15,9 @@ set(SOURCES
         src/main.cpp
 
         # Classes
-
+        src/board.cpp
+        src/bonus.cpp
+        src/spot.cpp
 
         # Other Sources
 
