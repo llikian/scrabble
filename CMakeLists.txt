@@ -2,6 +2,9 @@
 cmake_minimum_required(VERSION 3.26)
 project(Scrabble)
 
+# Find Packages
+find_package(SDL2 REQUIRED)
+
 # Compiler options
 set(CMAKE_CXX_STANDARD 23)
 
@@ -15,6 +18,7 @@ set(SOURCES
         src/main.cpp
 
         # Classes
+        src/Application.cpp
         src/Board.cpp
         src/Bonus.cpp
         src/Spot.cpp
@@ -30,11 +34,11 @@ set(INCLUDES
         include
 
         # Libraries
-
+        ${SDL2_INCLUDE_DIRS}
 )
 
 set(LIBRARIES
-
+        ${SDL2_LIBRARIES}
 )
 
 # Executable
