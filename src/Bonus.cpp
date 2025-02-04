@@ -1,4 +1,4 @@
-#include "bonus.hpp"
+#include "Bonus.hpp"
 
 //apply the letter factor on a letter score
 unsigned int Bonus::apply_letter(unsigned int score) const {

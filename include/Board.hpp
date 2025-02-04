@@ -1,6 +1,6 @@
 #pragma once
 
-#include "spot.hpp"
+#include "Spot.hpp"
 
 #include <iostream>
 

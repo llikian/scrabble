@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bonus.hpp"
+#include "Bonus.hpp"
 
 #include <iostream>
 

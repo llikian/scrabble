@@ -1,4 +1,4 @@
-#include "spot.hpp"
+#include "Spot.hpp"
 
 //display of the spot contents
 std::ostream& operator <<(std::ostream& out, Spot s) {

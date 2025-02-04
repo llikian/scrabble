@@ -1,5 +1,5 @@
 
-#include "board.hpp"
+#include "Board.hpp"
 
 #include <fstream>
 

@@ -15,9 +15,9 @@ set(SOURCES
         src/main.cpp
 
         # Classes
-        src/board.cpp
-        src/bonus.cpp
-        src/spot.cpp
+        src/Board.cpp
+        src/Bonus.cpp
+        src/Spot.cpp
 
         # Other Sources
 
