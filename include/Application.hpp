@@ -5,21 +5,12 @@
 
 #pragma once
 
-extern "C" {
 #include <SDL2/SDL.h>
-}
-
 #include <unordered_map>
 
-#define BOARD_SIZE 15
+#include "Spot.hpp"
 
-enum class Cell {
-    None,
-    LetterX2,
-    LetterX3,
-    WordX2,
-    WordX3
-};
+#define BOARD_SIZE 15
 
 /**
  * @class Application
@@ -41,7 +32,7 @@ private:
 
     int width, height;
 
-    Cell board[BOARD_SIZE][BOARD_SIZE];
+    Spot board[BOARD_SIZE][BOARD_SIZE];
 
     bool stop;
     std::unordered_map<SDL_Scancode, bool> keysFlags;
