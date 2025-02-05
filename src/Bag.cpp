@@ -7,14 +7,15 @@
 
 #include <iostream>
 
-Bag::Bag() : letters(nullptr), size(0), capacity(0) {
+Bag::Bag() : letters(nullptr), size(0) {
     srand(time(nullptr));
 
+    unsigned int totalLetters = 0;
     for(unsigned int letterCount: letterCounts) {
-        capacity += letterCount;
+        totalLetters += letterCount;
     }
 
-    letters = new char[capacity];
+    letters = new char[totalLetters];
     for(int i = 0 ; i < ALPHABET_SIZE ; ++i) {
         for(unsigned int j = 0 ; j < letterCounts[i] ; ++j) {
             letters[size] = 'a' + i;
@@ -22,25 +23,21 @@ Bag::Bag() : letters(nullptr), size(0), capacity(0) {
         }
     }
 
-    if(size != capacity) {
+    if(size != totalLetters) {
         throw std::runtime_error("The bag was not filled.");
     }
 
     /* Shuffle using the Fisher-Yates method:
      * https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_modern_algorithm
      */
-    int j;
+    int index;
     char tmp;
     for(int i = size - 1 ; i >= 1 ; --i) {
-        j = rand() % (i + 1);
+        index = rand() % (i + 1);
 
         tmp = letters[i];
-        letters[i] = letters[j];
-        letters[j] = tmp;
-    }
-
-    for(int i = 0 ; i < size ; ++i) {
-        std::cout << letters[i] << ' ';
+        letters[i] = letters[index];
+        letters[index] = tmp;
     }
 }
 
