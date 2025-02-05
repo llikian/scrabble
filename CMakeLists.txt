@@ -19,6 +19,9 @@ set(SOURCES
 
         # Classes
         src/Application.cpp
+        src/Bag.cpp
+        src/Player.cpp
+        src/Spot.cpp
 
         # Other Sources
 
@@ -36,6 +39,7 @@ set(INCLUDES
 
 set(LIBRARIES
         ${SDL2_LIBRARIES}
+        SDL2_ttf
 )
 
 # Executable
