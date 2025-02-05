@@ -10,7 +10,7 @@
 
 Application::Application()
     : window(nullptr), renderer(nullptr), font(nullptr),
-      width(1200), height(800),
+      width(1440), height(810),
       stop(false),
       player(bag),
       squareLength(0) {
@@ -94,6 +94,8 @@ Application::~Application() {
 }
 
 void Application::run() {
+    std::string score = "SCORE: ";
+
     while(!stop) {
         handleEvents();
 
@@ -101,6 +103,7 @@ void Application::run() {
         SDL_RenderClear(renderer);
 
         drawBoard();
+        drawText(5, 5, score + std::to_string(player.points), 238, 195, 166);
 
         SDL_RenderPresent(renderer);
     }
