@@ -5,7 +5,6 @@
 
 #include <iostream>
 #include <stdexcept>
-#include <vector>
 
 #include "Application.hpp"
 

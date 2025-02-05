@@ -5,9 +5,9 @@
 
 #pragma once
 
+#include <iostream>
 #include <random>
 #include <vector>
-#include <iostream>
 
 #define ALPHABET_SIZE 26
 
@@ -16,6 +16,7 @@
  * @brief
  */
 struct Bag {
+public:
     Bag();
 
     char drawLetter();
