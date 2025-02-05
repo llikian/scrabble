@@ -249,7 +249,7 @@ void Application::drawBoard() {
                     break;
                 case BonusType::WordX2:
                     text[0] = '2';
-                    setColor(255, 123, 189);
+                    setColor(255, 148, 202);
                     break;
                 case BonusType::WordX3:
                     text[0] = '3';
