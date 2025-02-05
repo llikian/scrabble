@@ -223,7 +223,7 @@ void Application::handleResize() {
 
 void Application::drawBoard() {
     SDL_Rect rect;
-    char text[1];
+    char text[2] = " ";
 
     board[7][7].character = 'A';
     board[8][7].character = 'V';

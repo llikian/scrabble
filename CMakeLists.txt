@@ -2,9 +2,6 @@
 cmake_minimum_required(VERSION 3.26)
 project(Scrabble)
 
-# Find Packages
-find_package(SDL2 REQUIRED)
-
 # Compiler options
 set(CMAKE_CXX_STANDARD 23)
 
@@ -45,8 +42,23 @@ set(LIBRARIES
 # Executable
 add_executable(${PROJECT_NAME} ${SOURCES})
 
+# Find Packages
+if(WIN32)
+    set(SDL2_PATH "C:/Libs/SDL2")
+    set(SDL2_LIBRARIES SDL2main SDL2 SDL2_ttf)
+    set(SDL2_INCLUDE_DIRS ${SDL2_PATH}/include ${SDL2_TTF_PATH}/include)
+
+    target_include_directories(${PROJECT_NAME} PUBLIC ${SDL2_PATH}/include)
+    target_link_directories(${PROJECT_NAME} PUBLIC ${SDL2_PATH}/lib/x64/)
+    target_link_libraries(${PROJECT_NAME} PUBLIC ${SDL2_LIBRARIES})
+
+else()
+    find_package(SDL2 REQUIRED)
+    find_package(SDL2_ttf REQUIRED)
+    target_link_libraries(${PROJECT_NAME} PUBLIC ${LIBRARIES})
+endif()
+
 target_include_directories(${PROJECT_NAME} PUBLIC ${INCLUDES})
-target_link_libraries(${PROJECT_NAME} PUBLIC ${LIBRARIES})
 
 # Set output directories
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)

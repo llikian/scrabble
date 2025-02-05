@@ -8,7 +8,7 @@
 
 #include "Application.hpp"
 
-int main() {
+int SDL_main(int, char**) {
     try {
         Application().run();
     } catch(const std::exception& exception) {

@@ -1,0 +1,12 @@
+# ninja log v6
+2	228	7604727771704284	build.ninja	917b863c72cdd82f
+16	147	7604718267503717	CMakeFiles/Scrabble.dir/src/Spot.cpp.obj	34a42e181148aaf1
+13	144	7604718267473676	CMakeFiles/Scrabble.dir/src/Player.cpp.obj	8e4d9d963054420f
+11	572	7604718267443679	CMakeFiles/Scrabble.dir/src/Bag.cpp.obj	778d5efd3df3c31f
+4	932	7604727085382795	CMakeFiles/Scrabble.dir/src/main.cpp.obj	3feab0158c13a001
+7	1151	7604718850493538	CMakeFiles/Scrabble.dir/src/Application.cpp.obj	8af60e9de60d8a7
+4	105	7604727780538927	D:/Cours/LIFAlgoProg/bin/Scrabble.exe	b8afa04931fda1de
+5	937	7604727982220003	CMakeFiles/Scrabble.dir/src/main.cpp.obj	3feab0158c13a001
+938	1039	7604727991549258	D:/Cours/LIFAlgoProg/bin/Scrabble.exe	b8afa04931fda1de
+5	1090	7604730755601703	CMakeFiles/Scrabble.dir/src/Application.cpp.obj	8af60e9de60d8a7
+1091	1195	7604730766457227	D:/Cours/LIFAlgoProg/bin/Scrabble.exe	b8afa04931fda1de
