@@ -5,6 +5,10 @@
 
 #include "Dictionary.hpp"
 
+#include <algorithm>
+#include <iostream>
+#include <cctype>
+
 Node::Node(const char value, const bool isTerminal) : value(value), isTerminal(isTerminal), children{} {
 
 }
@@ -18,6 +22,7 @@ Dictionary::Dictionary(const std::string& loadPath) {
 
     std::ifstream file(loadPath);
     std::string str;
+
     while (std::getline(file, str))
     {
         insertWord(str);
@@ -27,7 +32,12 @@ Dictionary::Dictionary(const std::string& loadPath) {
 void Dictionary::insertWord(const std::string& word) {
     Node* current = root;
 
-    for(const char l: word) {
+    for(char l: word) {
+        if (l >= 'A' && l <= 'Z') {
+            // Convert uppercase to lowercase by adding 32
+            l += 32;
+        }
+
         if(current->children[l - 'a'] == nullptr) {
             current->children[l - 'a'] = new Node(l, false);
         }
