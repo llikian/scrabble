@@ -5,14 +5,23 @@
 
 #include "Dictionary.hpp"
 
-#include <algorithm>
-
 Node::Node(const char value, const bool isTerminal) : value(value), isTerminal(isTerminal), children{} {
 
 }
 
 Dictionary::Dictionary() {
     root = new Node('\0', false);
+}
+
+Dictionary::Dictionary(const std::string& loadPath) {
+    root = new Node('\0', false);
+
+    std::ifstream file(loadPath);
+    std::string str;
+    while (std::getline(file, str))
+    {
+        insertWord(str);
+    }
 }
 
 void Dictionary::insertWord(const std::string& word) {

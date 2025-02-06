@@ -7,6 +7,7 @@
 
 #include <Bag.hpp>
 #include <string>
+#include <fstream>
 
 struct Node {
     char value;
@@ -19,10 +20,11 @@ struct Node {
 //Trie structure
 class Dictionary {
 private:
+public:
     Node* root;
 
-public:
     Dictionary();
+    Dictionary(const std::string& loadPath);
 
     void insertWord(const std::string& word);
     bool containWord(const std::string& word);
