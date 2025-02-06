@@ -17,6 +17,7 @@ set(SOURCES
         # Classes
         src/Application.cpp
         src/Bag.cpp
+        src/Board.cpp
         src/Player.cpp
         src/Spot.cpp
         src/Dictionary.cpp
