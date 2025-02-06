@@ -1,16 +1,14 @@
 ﻿/***************************************************************************************************
-* @file  Dictionary.hpp
- * @brief Declaration of the dictionary class
+ * @file  Dictionary.hpp
+ * @brief Declaration of the Dictionary class
  **************************************************************************************************/
 
-#ifndef DICTIONARY_H
-#define DICTIONARY_H
+#pragma once
 
 #include <Bag.hpp>
 #include <string>
 
-struct Node
-{
+struct Node {
     char value;
     bool isTerminal;
     Node* children[ALPHABET_SIZE];
@@ -29,7 +27,3 @@ public:
     void insertWord(const std::string& word);
     bool containWord(const std::string& word);
 };
-
-
-
-#endif //DICTIONARY_H
