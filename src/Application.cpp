@@ -41,50 +41,7 @@ Application::Application()
 
     handleResize();
 
-    /* ---- Initialize Board ---- */
-    static const char rawBoard[BOARD_SIZE][BOARD_SIZE + 1]{
-        "3..d...3...d..3",
-        ".2...t...t...2.",
-        "..2...d.d...2..",
-        "d..2...d...2..d",
-        "....2.....2....",
-        ".t...t...t...t.",
-        "..d...d.d...d..",
-        "3..d...2...d..3",
-        "..d...d.d...d..",
-        ".t...t...t...t.",
-        "....2.....2....",
-        "d..2...d...2..d",
-        "..2...d.d...2..",
-        ".2...t...t...2.",
-        "3..d...3...d..3"
-    };
-
-    for(int i = 0 ; i < BOARD_SIZE ; ++i) {
-        for(int j = 0 ; j < BOARD_SIZE ; ++j) {
-            board[i][j].character = '\0';
-
-            switch(rawBoard[i][j]) {
-                case '.':
-                    board[i][j].type = BonusType::None;
-                    break;
-                case 'd':
-                    board[i][j].type = BonusType::LetterX2;
-                    break;
-                case 't':
-                    board[i][j].type = BonusType::LetterX3;
-                    break;
-                case '2':
-                    board[i][j].type = BonusType::WordX2;
-                    break;
-                case '3':
-                    board[i][j].type = BonusType::WordX3;
-                    break;
-                default:
-                    throw std::runtime_error("Invalid character in board creation.");
-            }
-        }
-    }
+    board.loadFromFile("data/boards/board0.txt");
 }
 
 Application::~Application() {
@@ -225,19 +182,12 @@ void Application::drawBoard() {
     SDL_Rect rect;
     char text[2] = " ";
 
-    board[7][7].character = 'A';
-    board[8][7].character = 'V';
-    board[9][7].character = 'I';
-    board[10][7].character = 'O';
-    board[11][7].character = 'N';
-    board[12][7].character = 'S';
-
     /* ---- Draw Board ---- */
     rect.w = rect.h = squareLength;
 
     for(int i = 0 ; i < BOARD_SIZE ; ++i) {
         for(int j = 0 ; j < BOARD_SIZE ; ++j) {
-            switch(board[i][j].type) {
+            switch(board.getBonusType(j, i)) {
                 case BonusType::None:
                     text[0] = '\0';
                     setColor(103, 88, 78);
@@ -265,11 +215,11 @@ void Application::drawBoard() {
 
             drawSquare(rect.x, rect.y, squareLength);
 
-            if(board[i][j].character != '\0') {
+            if(board(j, i) != '\0') {
                 setColor(238, 195, 166);
                 drawSquare(rect.x + 5, rect.y + 5, squareLength - 10);
 
-                text[0] = board[i][j].character;
+                text[0] = board(j, i);
                 drawCenteredText(rect, text, 103, 88, 78);
             } else if(text[0] != '\0') {
                 drawCenteredText(rect, text, 255, 255, 255);

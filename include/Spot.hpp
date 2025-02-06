@@ -5,7 +5,7 @@
 
 #pragma once
 
-enum class BonusType {
+enum class BonusType : unsigned char {
     None,
     LetterX2,
     LetterX3,

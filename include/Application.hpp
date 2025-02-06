@@ -17,10 +17,8 @@
 #include <unordered_map>
 
 #include "Bag.hpp"
+#include "Board.hpp"
 #include "Player.hpp"
-#include "Spot.hpp"
-
-#define BOARD_SIZE 15
 
 /**
  * @class Application
@@ -58,7 +56,7 @@ private:
     bool stop;
     std::unordered_map<SDL_Scancode, bool> keysFlags;
 
-    Spot board[BOARD_SIZE][BOARD_SIZE];
+    Board board;
     Bag bag;
     Player player;
 
