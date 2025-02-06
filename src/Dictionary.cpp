@@ -6,7 +6,10 @@
 
 #include <algorithm>
 
-Node::Node(const char value, const bool isTerminal) : value(value), isTerminal(isTerminal){ }
+Node::Node(const char value, const bool isTerminal) : value(value), isTerminal(isTerminal), children{}
+{
+
+}
 
 Dictionary::Dictionary()
 {
@@ -15,7 +18,15 @@ Dictionary::Dictionary()
 
 void Dictionary::insertWord(const std::string& word)
 {
+    Node* current = root;
 
+    for (int i = 0; i < word.size(); i++)
+    {
+        if (current->children[word[i] - 'a'] == nullptr)
+            current->children[word[i] - 'a'] = new Node(word[i] - 'a', false);
+        current = current->children[word[i] - 'a'];
+    }
+    current->isTerminal = true;
 }
 
 

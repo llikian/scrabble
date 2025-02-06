@@ -6,14 +6,14 @@
 #ifndef DICTIONARY_H
 #define DICTIONARY_H
 
+#include <Bag.hpp>
 #include <string>
-#include <vector>
 
 struct Node
 {
     char value;
     bool isTerminal;
-    std::vector<Node*> children;
+    Node* children[ALPHABET_SIZE];
 
     Node(char value, bool isTerminal);
 };
