@@ -20,11 +20,11 @@ void Dictionary::insertWord(const std::string& word)
 {
     Node* current = root;
 
-    for (int i = 0; i < word.size(); i++)
+    for (const char i : word)
     {
-        if (current->children[word[i] - 'a'] == nullptr)
-            current->children[word[i] - 'a'] = new Node(word[i] - 'a', false);
-        current = current->children[word[i] - 'a'];
+        if (current->children[i - 'a'] == nullptr)
+            current->children[i - 'a'] = new Node(i - 'a', false);
+        current = current->children[i - 'a'];
     }
     current->isTerminal = true;
 }
@@ -32,6 +32,14 @@ void Dictionary::insertWord(const std::string& word)
 
 bool Dictionary::containWord(const std::string& word)
 {
-    return false;
+    const Node* current = root;
+
+    for (const char i : word)
+    {
+        if (current->children[i - 'a'] == nullptr)
+            return false;
+        current = current->children[i - 'a'];
+    }
+    return current->isTerminal;
 }
 
