@@ -19,6 +19,8 @@ set(SOURCES
         src/Bag.cpp
         src/Player.cpp
         src/Spot.cpp
+        src/Dictionary.cpp
+        include/Dictionary.hpp
 
         # Other Sources
 

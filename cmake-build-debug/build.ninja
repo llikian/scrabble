@@ -84,6 +84,13 @@ build CMakeFiles/Scrabble.dir/src/Spot.cpp.obj: CXX_COMPILER__Scrabble_unscanned
   OBJECT_DIR = CMakeFiles\Scrabble.dir
   OBJECT_FILE_DIR = CMakeFiles\Scrabble.dir\src
 
+build CMakeFiles/Scrabble.dir/src/Dictionary.cpp.obj: CXX_COMPILER__Scrabble_unscanned_Debug D$:/Cours/LIFAlgoProg/src/Dictionary.cpp || cmake_object_order_depends_target_Scrabble
+  DEP_FILE = CMakeFiles\Scrabble.dir\src\Dictionary.cpp.obj.d
+  FLAGS = -Wall -Wextra -Wpedantic -ggdb -O0 -std=gnu++23 -fdiagnostics-color=always
+  INCLUDES = -IC:/Libs/SDL2/include -ID:/Cours/LIFAlgoProg/include
+  OBJECT_DIR = CMakeFiles\Scrabble.dir
+  OBJECT_FILE_DIR = CMakeFiles\Scrabble.dir\src
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target Scrabble
@@ -92,7 +99,7 @@ build CMakeFiles/Scrabble.dir/src/Spot.cpp.obj: CXX_COMPILER__Scrabble_unscanned
 #############################################
 # Link the executable D:\Cours\LIFAlgoProg\bin\Scrabble.exe
 
-build D$:/Cours/LIFAlgoProg/bin/Scrabble.exe: CXX_EXECUTABLE_LINKER__Scrabble_Debug CMakeFiles/Scrabble.dir/src/main.cpp.obj CMakeFiles/Scrabble.dir/src/Application.cpp.obj CMakeFiles/Scrabble.dir/src/Bag.cpp.obj CMakeFiles/Scrabble.dir/src/Player.cpp.obj CMakeFiles/Scrabble.dir/src/Spot.cpp.obj
+build D$:/Cours/LIFAlgoProg/bin/Scrabble.exe: CXX_EXECUTABLE_LINKER__Scrabble_Debug CMakeFiles/Scrabble.dir/src/main.cpp.obj CMakeFiles/Scrabble.dir/src/Application.cpp.obj CMakeFiles/Scrabble.dir/src/Bag.cpp.obj CMakeFiles/Scrabble.dir/src/Player.cpp.obj CMakeFiles/Scrabble.dir/src/Spot.cpp.obj CMakeFiles/Scrabble.dir/src/Dictionary.cpp.obj
   FLAGS = -Wall -Wextra -Wpedantic -ggdb -O0
   LINK_LIBRARIES = -lSDL2main  -lSDL2  -lSDL2_ttf  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   LINK_PATH = -LC:/Libs/SDL2/lib/x64
