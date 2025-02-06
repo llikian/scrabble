@@ -32,12 +32,10 @@ set(INCLUDES
         include
 
         # Libraries
-        ${SDL2_INCLUDE_DIRS}
 )
 
 set(LIBRARIES
-        SDL2
-        SDL2_ttf
+
 )
 
 # Executable
@@ -47,13 +45,15 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 if(WIN32)
     set(SDL2_PATH "C:/Libs/SDL2")
 
-    set(INCLUDES ${INCLUDES} ${SDL2_PATH}/include ${SDL2_TTF_PATH}/include)
-    set(LIBRARIES SDL2main ${LIBRARIES})
-
     target_link_directories(${PROJECT_NAME} PUBLIC ${SDL2_PATH}/lib/x64/)
+
+    set(INCLUDES ${INCLUDES} ${SDL2_PATH}/include ${SDL2_TTF_PATH}/include)
+    set(LIBRARIES ${LIBRARIES} SDL2main SDL2 SDL2_ttf)
 else()
     find_package(SDL2 REQUIRED)
-    target_link_libraries(${PROJECT_NAME} PUBLIC ${LIBRARIES})
+
+    set(INCLUDES ${INCLUDES} ${SDL2_INCLUDE_DIRS})
+    set(LIBRARIES ${LIBRARIES} SDL2 SDL2_ttf)
 endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${INCLUDES})
