@@ -21,6 +21,8 @@ set(SOURCES
         src/Player.cpp
         src/Spot.cpp
         src/Dictionary.cpp
+        src/Test.cpp
+        include/Test.hpp
 
         # Other Sources
 
