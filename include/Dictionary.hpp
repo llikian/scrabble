@@ -29,3 +29,5 @@ public:
     void insertWord(const std::string& word);
     bool containWord(const std::string& word);
 };
+
+

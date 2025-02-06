@@ -7,8 +7,11 @@
 #include <stdexcept>
 
 #include "Application.hpp"
+#include "Test.hpp"
 
 int main(int, char**) {
+    testAll();
+
     try {
         Application().run();
     } catch(const std::exception& exception) {

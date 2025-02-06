@@ -17,6 +17,7 @@ void testDictionary()
 {
     Dictionary dico;
     dico.insertWord("abc");
+
     assert(dico.root->children[0]->children[1]->children[2]->value == 'c');
     assert(dico.containWord("abc"));
     assert(!dico.containWord("a"));
