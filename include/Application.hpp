@@ -19,6 +19,7 @@
 #include "Bag.hpp"
 #include "Board.hpp"
 #include "Player.hpp"
+#include "Dictionary.hpp"
 
 /**
  * @class Application
@@ -56,6 +57,7 @@ private:
     bool stop;
     std::unordered_map<SDL_Scancode, bool> keysFlags;
 
+    Dictionary dictionary;
     Board board;
     Bag bag;
     Player player;

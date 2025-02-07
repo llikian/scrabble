@@ -14,6 +14,10 @@ Dictionary::Dictionary() : root(new Node('\0', false)) { }
 
 Dictionary::Dictionary(const std::string& loadPath, bool isGADDAG) : root(new Node('\0', false)) {
     std::ifstream file(loadPath);
+    if(!file.is_open()) {
+        throw std::runtime_error("Couldn't open file \"" + loadPath +"\".");
+    }
+
     std::string word;
 
     if(isGADDAG) {
