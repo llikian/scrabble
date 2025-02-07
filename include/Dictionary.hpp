@@ -5,10 +5,10 @@
 
 #pragma once
 
-#include <Bag.hpp>
 #include <string>
+#include "Bag.hpp"
 
-#define UPPERCASE_TO_LOWERCASE(l) (l += 32)
+#define LOWERCASE_TO_UPPERCASE(l) l -= 32
 
 struct Node {
     char value;
@@ -20,16 +20,16 @@ struct Node {
 
 //Trie structure
 class Dictionary {
-private:
 public:
     Node* root;
 
     Dictionary();
     Dictionary(const std::string& loadPath, bool isGADDAG = false);
 
+    Dictionary(const Dictionary&) = delete;
+    void operator=(const Dictionary&) = delete;
+
     void insertWord(const std::string& word);
     void insertGADDAGWord(const std::string& word);
     bool containWord(const std::string& word);
 };
-
-

@@ -5,8 +5,6 @@
 
 #include "Dictionary.hpp"
 
-#include <algorithm>
-#include <iostream>
 #include <fstream>
 #include "Board.hpp"
 
@@ -20,11 +18,15 @@ Dictionary::Dictionary(const std::string& loadPath, bool isGADDAG) : root(new No
 
     if(isGADDAG) {
         while(file >> word) {
-            insertGADDAGWord(word);
+            if(word.size() >= 0 && word.size() <= BOARD_SIZE) {
+                insertGADDAGWord(word);
+            }
         }
     } else {
         while(file >> word) {
-            insertWord(word);
+            if(word.size() >= 0 && word.size() <= BOARD_SIZE) {
+                insertWord(word);
+            }
         }
     }
 }
@@ -33,12 +35,12 @@ void Dictionary::insertWord(const std::string& word) {
     Node* current = root;
 
     for(char l: word) {
-        if(l >= 'A' && l <= 'Z') {
-            UPPERCASE_TO_LOWERCASE(l);
+        if(l >= 'a' && l <= 'z') {
+            LOWERCASE_TO_UPPERCASE(l);
         }
 
         //if char is '+', put at the end, else put at alphabet position
-        const int pos = l == '+' ? ALPHABET_SIZE : l - 'a';
+        const int pos = l == '+' ? ALPHABET_SIZE : l - 'A';
 
         if(current->children[pos] == nullptr) {
             current->children[pos] = new Node(l, false);
@@ -62,13 +64,12 @@ void Dictionary::insertGADDAGWord(const std::string& word) {
     }
 }
 
-
 bool Dictionary::containWord(const std::string& word) {
     const Node* current = root;
 
     for(const char l: word) {
         //if char is '+', check at the end, else check at alphabet position
-        const int pos = l == '+' ? ALPHABET_SIZE : l - 'a';
+        const int pos = l == '+' ? ALPHABET_SIZE : l - 'A';
 
         if(current->children[pos] == nullptr) {
             return false;
@@ -79,4 +80,3 @@ bool Dictionary::containWord(const std::string& word) {
 
     return current->isTerminal;
 }
-
