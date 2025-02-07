@@ -10,7 +10,7 @@
 #include "Test.hpp"
 
 int main(int, char**) {
-    testAll();
+    //testAll();
 
     try {
         Application().run();

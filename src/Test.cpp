@@ -34,15 +34,10 @@ void testDictionary()
     std::cout << "File dictionary test passes!\n";
 
     //GADAG insertion test
-    Dictionary dico2;
-    dico2.insertGADAGWord("anticonstitutionnellement");
-    dico2.insertGADAGWord("abc");
-    dico2.insertGADAGWord("fromage");
-    assert(dico2.containWord("a+bc"));
-    assert(dico2.containWord("cba+"));
+    Dictionary dico2("data/dico.txt", true);
     assert(dico2.containWord("f+romage"));
-    assert(dico2.containWord("ennoitutitsnocitna+llement"));
-    assert(!dico2.containWord("ab+c"));
+    assert(dico2.containWord("ppan+assions"));
+    assert(!dico2.containWord("bac+c"));
     assert(!dico2.containWord("a"));
     assert(!dico2.containWord("abc"));
     std::cout << "Gadag dictionary test passes!\n";

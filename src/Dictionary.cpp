@@ -23,9 +23,26 @@ Dictionary::Dictionary(const std::string& loadPath) {
     std::ifstream file(loadPath);
     std::string str;
 
-    while (std::getline(file, str))
-    {
+    while (std::getline(file, str)) {
         insertWord(str);
+    }
+}
+
+Dictionary::Dictionary(const std::string& loadPath, const bool isGADAG) {
+    root = new Node('\0', false);
+
+    std::ifstream file(loadPath);
+    std::string str;
+
+    if (isGADAG) {
+        while (std::getline(file, str)) {
+            insertGADAGWord(str);
+        }
+    }
+    else {
+        while (std::getline(file, str)) {
+            insertWord(str);
+        }
     }
 }
 

@@ -24,6 +24,7 @@ public:
 
     Dictionary();
     Dictionary(const std::string& loadPath);
+    Dictionary(const std::string& loadPath, bool isGADAG);
 
     void insertWord(const std::string& word);
     void insertGADAGWord(const std::string& word);
