@@ -34,8 +34,7 @@ void Dictionary::insertWord(const std::string& word) {
 
     for(char l: word) {
         if(l >= 'A' && l <= 'Z') {
-            // Convert uppercase to lowercase by adding 32
-            l += 32;
+            UPPERCASE_TO_LOWERCASE(l);
         }
 
         //if char is '+', put at the end, else put at alphabet position

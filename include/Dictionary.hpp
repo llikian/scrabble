@@ -8,6 +8,8 @@
 #include <Bag.hpp>
 #include <string>
 
+#define UPPERCASE_TO_LOWERCASE(l) (l += 32)
+
 struct Node {
     char value;
     bool isTerminal;
