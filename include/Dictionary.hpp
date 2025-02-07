@@ -23,11 +23,10 @@ public:
     Node* root;
 
     Dictionary();
-    Dictionary(const std::string& loadPath);
-    Dictionary(const std::string& loadPath, bool isGADAG);
+    Dictionary(const std::string& loadPath, bool isGADDAG = false);
 
     void insertWord(const std::string& word);
-    void insertGADAGWord(const std::string& word);
+    void insertGADDAGWord(const std::string& word);
     bool containWord(const std::string& word);
 };
 

@@ -33,14 +33,14 @@ void testDictionary()
     assert(!dico1.containWord("vhjidvu"));
     std::cout << "File dictionary test passes!\n";
 
-    //GADAG insertion test
+    //GADDAG insertion test
     Dictionary dico2("data/dico.txt", true);
     assert(dico2.containWord("f+romage"));
     assert(dico2.containWord("ppan+assions"));
     assert(!dico2.containWord("bac+c"));
     assert(!dico2.containWord("a"));
     assert(!dico2.containWord("abc"));
-    std::cout << "Gadag dictionary test passes!\n";
+    std::cout << "Gaddag dictionary test passes!\n";
 
     std::cout << "Dictionary test passes!\n";
 }

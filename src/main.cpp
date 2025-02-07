@@ -3,14 +3,14 @@
  * @brief Contains the main program of the engine
  **************************************************************************************************/
 
+#include "Application.hpp"
+
 #include <iostream>
 #include <stdexcept>
-
-#include "Application.hpp"
 #include "Test.hpp"
 
 int main(int, char**) {
-    //testAll();
+    testAll();
 
     try {
         Application().run();
