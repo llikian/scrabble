@@ -5,6 +5,7 @@
 
 #include "Dictionary.hpp"
 
+#include <algorithm>
 #include <fstream>
 #include "Board.hpp"
 
@@ -22,13 +23,13 @@ Dictionary::Dictionary(const std::string& loadPath, bool isGADDAG) : root(new No
 
     if(isGADDAG) {
         while(file >> word) {
-            if(word.size() >= 0 && word.size() <= BOARD_SIZE) {
+            if(!word.empty() && word.size() <= BOARD_SIZE) {
                 insertGADDAGWord(word);
             }
         }
     } else {
         while(file >> word) {
-            if(word.size() >= 0 && word.size() <= BOARD_SIZE) {
+            if(!word.empty() && word.size() <= BOARD_SIZE) {
                 insertWord(word);
             }
         }
