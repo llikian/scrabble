@@ -45,7 +45,16 @@ void testDictionary() {
     std::string word;
     while(file >> word) {
         if(!word.empty() && word.size() <= 15) {
-            assert(dico3.containWord('+' + word));
+            int len = word.length();
+
+            word.insert(0, "+");
+            assert(!dico3.containWord(word));
+
+            // For each letter in the word, create a word by mirroring it around the '+'
+            for(int i = 1 ; i <= len ; i++) {
+                std::rotate(word.begin(), word.begin() + i, word.begin() + i + 1);
+                assert(dico3.containWord(word));
+            }
         }
     }
     std::cout << "\tFull dictionary test passes!\n";
