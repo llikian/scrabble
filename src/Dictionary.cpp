@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <iostream>
 #include "Board.hpp"
 
 Node::Node(const char value, const bool isTerminal) : value(value), isTerminal(isTerminal), children{} { }
@@ -44,7 +45,7 @@ void Dictionary::insertWord(const std::string& word) {
             LOWERCASE_TO_UPPERCASE(l);
         }
 
-        //if char is '+', put at the end, else put at alphabet position
+        // If char is '+', put at the end, else put at alphabet position
         const int pos = l == '+' ? ALPHABET_SIZE : l - 'A';
 
         if(current->children[pos] == nullptr) {
@@ -58,11 +59,13 @@ void Dictionary::insertWord(const std::string& word) {
 }
 
 void Dictionary::insertGADDAGWord(const std::string& word) {
+    int len = word.length();
+
     std::string gaddagWord = word;
     gaddagWord.insert(0, "+");
 
-    //for each letter in the word, create a word by mirroring it around the '+'
-    for(int i = 0 ; i < static_cast<int>(gaddagWord.length()) ; i++) {
+    // For each letter in the word, create a word by mirroring it around the '+'
+    for(int i = 1 ; i <= len ; i++) {
         std::rotate(gaddagWord.begin(), gaddagWord.begin() + i, gaddagWord.begin() + i + 1);
 
         insertWord(gaddagWord);
@@ -73,7 +76,7 @@ bool Dictionary::containWord(const std::string& word) {
     const Node* current = root;
 
     for(const char l: word) {
-        //if char is '+', check at the end, else check at alphabet position
+        // If char is '+', check at the end, else check at alphabet position
         const int pos = l == '+' ? ALPHABET_SIZE : l - 'A';
 
         if(current->children[pos] == nullptr) {
