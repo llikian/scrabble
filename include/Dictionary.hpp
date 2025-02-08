@@ -24,12 +24,15 @@ public:
     Node* root;
 
     Dictionary();
-    Dictionary(const std::string& loadPath, bool isGADDAG = false);
+    Dictionary(const std::string& loadPath);
 
     Dictionary(const Dictionary&) = delete;
     void operator=(const Dictionary&) = delete;
 
-    void insertWord(const std::string& word);
     void insertGADDAGWord(const std::string& word);
     bool containWord(const std::string& word);
+
+    static void unitTests();
+private:
+    void insertWord(const std::string& word);
 };

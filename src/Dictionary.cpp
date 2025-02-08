@@ -6,6 +6,7 @@
 #include "Dictionary.hpp"
 
 #include <algorithm>
+#include <cassert>
 #include <fstream>
 #include <iostream>
 #include "Board.hpp"
@@ -14,25 +15,16 @@ Node::Node(const char value, const bool isTerminal) : value(value), isTerminal(i
 
 Dictionary::Dictionary() : root(new Node('\0', false)) { }
 
-Dictionary::Dictionary(const std::string& loadPath, bool isGADDAG) : root(new Node('\0', false)) {
+Dictionary::Dictionary(const std::string& loadPath) : root(new Node('\0', false)) {
     std::ifstream file(loadPath);
     if(!file.is_open()) {
-        throw std::runtime_error("Couldn't open file \"" + loadPath +"\".");
+        throw std::runtime_error("Couldn't open file \"" + loadPath + "\".");
     }
 
     std::string word;
-
-    if(isGADDAG) {
-        while(file >> word) {
-            if(!word.empty() && word.size() <= BOARD_SIZE) {
-                insertGADDAGWord(word);
-            }
-        }
-    } else {
-        while(file >> word) {
-            if(!word.empty() && word.size() <= BOARD_SIZE) {
-                insertWord(word);
-            }
+    while(file >> word) {
+        if(!word.empty() && word.size() <= BOARD_SIZE) {
+            insertGADDAGWord(word);
         }
     }
 }
@@ -87,4 +79,81 @@ bool Dictionary::containWord(const std::string& word) {
     }
 
     return current->isTerminal;
+}
+
+void Dictionary::unitTests() {
+    std::cout << "Dictionnary Unit Tests:\n";
+
+    /* Manual Insertion Test */ {
+        Dictionary dico;
+
+        dico.insertWord("abc");
+        assert(dico.root->children[0]->children[1]->children[2]->value == 'C');
+        assert(dico.containWord("ABC"));
+        assert(!dico.containWord("A"));
+        assert(!dico.containWord("ABCE"));
+        assert(!dico.containWord("SKIBIDI"));
+
+        dico.insertGADDAGWord("ABC");
+        assert(!dico.containWord("+ABC"));
+        assert(dico.containWord("A+BC"));
+        assert(dico.containWord("BA+C"));
+        assert(dico.containWord("CBA+"));
+
+        std::cout << "  Manual insertion test passes!\n";
+    }
+
+    /* File Insertion Test */ {
+        Dictionary dico;
+        std::ifstream file("data/dico.txt");
+        std::string word;
+        while(file >> word) {
+            if(!word.empty() && word.size() <= BOARD_SIZE) {
+                dico.insertGADDAGWord(word);
+            }
+        }
+
+        assert(dico.containWord("AA"));
+        assert(!dico.containWord("AAHJG"));
+        assert(dico.containWord("MUTAZILISMES"));
+        assert(!dico.containWord("VHJIDVU"));
+
+        std::cout << "  File insertion test passes!\n";
+    }
+
+    /* GADDAG Insertion Test */ {
+        Dictionary dico2("data/dico.txt");
+
+        assert(dico2.containWord("F+ROMAGE"));
+        assert(dico2.containWord("PPAN+ASSIONS"));
+        assert(!dico2.containWord("BAC+C"));
+        assert(!dico2.containWord("A"));
+        assert(!dico2.containWord("ABC"));
+
+        std::cout << "  Gaddag insertion test passes!\n";
+    }
+
+    /* Full Dictionary Test */ {
+        Dictionary dico("data/dico.txt");
+        std::ifstream file("data/dico.txt");
+        std::string word;
+
+        while(file >> word) {
+            if(!word.empty() && word.size() <= 15) {
+                int len = word.length();
+
+                word.insert(0, "+");
+                assert(!dico.containWord(word));
+
+                for(int i = 1 ; i <= len ; i++) {
+                    std::rotate(word.begin(), word.begin() + i, word.begin() + i + 1);
+                    assert(dico.containWord(word));
+                }
+            }
+        }
+
+        std::cout << "  Full dictionary test passes!\n";
+    }
+
+    std::cout << "All dictionary tests passed!\n\n";
 }

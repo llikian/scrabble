@@ -12,7 +12,7 @@ Application::Application()
     : window(nullptr), renderer(nullptr), font(nullptr),
       width(1440), height(810),
       stop(false),
-      dictionary("data/dico.txt", true),
+      dictionary("data/dico.txt"),
       player(bag),
       squareLength(0) {
 
