@@ -12,29 +12,16 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic")
 
 # Set sources and includes
 set(SOURCES
-        src/main.cpp
-
-        # Classes
         src/Application.cpp
         src/Bag.cpp
         src/Board.cpp
         src/Player.cpp
         src/Spot.cpp
         src/Dictionary.cpp
-        src/Test.cpp
-        include/Test.hpp
-
-        # Other Sources
-
-
-        # Libraries
-
 )
 
 set(INCLUDES
         include
-
-        # Libraries
 )
 
 set(LIBRARIES
@@ -42,9 +29,9 @@ set(LIBRARIES
 )
 
 # Executable
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(${PROJECT_NAME} src/main.cpp ${SOURCES})
 
-# Find Packages
+# Include Directories & Libraries
 if(WIN32)
     set(SDL2_PATH "C:/Libs/SDL2")
 
@@ -61,6 +48,11 @@ endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${INCLUDES})
 target_link_libraries(${PROJECT_NAME} PUBLIC ${LIBRARIES})
+
+# Tests Executable
+add_executable(Tests src/test.cpp ${SOURCES})
+target_include_directories(Tests PUBLIC ${INCLUDES})
+target_link_libraries(Tests PUBLIC ${LIBRARIES})
 
 # Set output directories
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)

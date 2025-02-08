@@ -1,17 +1,14 @@
 /***************************************************************************************************
  * @file  main.cpp
- * @brief Contains the main program of the engine
+ * @brief Contains the main program of the project
  **************************************************************************************************/
 
 #include "Application.hpp"
 
 #include <iostream>
 #include <stdexcept>
-#include "Test.hpp"
 
 int main(int, char**) {
-    //testAll();
-
     try {
         Application().run();
     } catch(const std::exception& exception) {
