@@ -29,6 +29,10 @@ Dictionary::Dictionary(const std::string& loadPath) : root(new Node('\0', false)
     }
 }
 
+Dictionary::~Dictionary() {
+    delete root;
+}
+
 void Dictionary::insertWord(const std::string& word) {
     Node* current = root;
 
@@ -109,7 +113,7 @@ void Dictionary::unitTests() {
         std::string word;
         while(file >> word) {
             if(!word.empty() && word.size() <= BOARD_SIZE) {
-                dico.insertGADDAGWord(word);
+                dico.insertWord(word);
             }
         }
 
@@ -122,13 +126,13 @@ void Dictionary::unitTests() {
     }
 
     /* GADDAG Insertion Test */ {
-        Dictionary dico2("data/dico.txt");
+        Dictionary dico("data/dico.txt");
 
-        assert(dico2.containWord("F+ROMAGE"));
-        assert(dico2.containWord("PPAN+ASSIONS"));
-        assert(!dico2.containWord("BAC+C"));
-        assert(!dico2.containWord("A"));
-        assert(!dico2.containWord("ABC"));
+        assert(dico.containWord("F+ROMAGE"));
+        assert(dico.containWord("PPAN+ASSIONS"));
+        assert(!dico.containWord("BAC+C"));
+        assert(!dico.containWord("A"));
+        assert(!dico.containWord("ABC"));
 
         std::cout << "  Gaddag insertion test passes!\n";
     }

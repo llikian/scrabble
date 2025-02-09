@@ -13,7 +13,7 @@
 struct Node {
     char value;
     bool isTerminal;
-    Node* children[ALPHABET_SIZE + 1]; //+1 for '+' character
+    Node* children[ALPHABET_SIZE + 1]; // +1 for '+' character
 
     Node(char value, bool isTerminal);
 };
@@ -25,6 +25,7 @@ public:
 
     Dictionary();
     Dictionary(const std::string& loadPath);
+    ~Dictionary();
 
     Dictionary(const Dictionary&) = delete;
     void operator=(const Dictionary&) = delete;
