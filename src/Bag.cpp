@@ -18,7 +18,7 @@ Bag::Bag() : letters(nullptr), size(0) {
     letters = new char[totalLetters];
     for(int i = 0 ; i < ALPHABET_SIZE ; ++i) {
         for(unsigned int j = 0 ; j < letterCounts[i] ; ++j) {
-            letters[size] = 'a' + i;
+            letters[size] = 'A' + i;
             ++size;
         }
     }

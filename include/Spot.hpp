@@ -13,7 +13,16 @@ enum class BonusType : unsigned char {
     WordX3
 };
 
+struct Position {
+    unsigned int x;
+    unsigned int y;
+};
+
 struct Spot {
+    Spot();
+    Spot(char character, BonusType type, unsigned int x, unsigned int y);
+
     char character;
     BonusType type;
+    Position position;
 };

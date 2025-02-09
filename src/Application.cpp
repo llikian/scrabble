@@ -13,6 +13,7 @@ Application::Application()
       width(1440), height(810),
       stop(false),
       dictionary("data/dico.txt"),
+      board(bag, dictionary),
       player(bag),
       squareLength(0) {
 
@@ -42,7 +43,8 @@ Application::Application()
 
     handleResize();
 
-    board.loadFromFile("data/boards/board0.txt");
+    board.loadFromFile("data/boards/board1.txt");
+    board.findBestMove(player);
 }
 
 Application::~Application() {
@@ -158,6 +160,12 @@ void Application::handleInputs(SDL_Scancode scancode) {
     switch(scancode) {
         case SDL_SCANCODE_ESCAPE:
             stop = true;
+            break;
+        case SDL_SCANCODE_SPACE:
+            if(!keysFlags[scancode]) {
+                board.findBestMove(player);
+                keysFlags.at(scancode) = true;
+            }
             break;
         default:
             break;

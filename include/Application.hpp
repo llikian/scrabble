@@ -58,8 +58,8 @@ private:
     std::unordered_map<SDL_Scancode, bool> keysFlags;
 
     Dictionary dictionary;
-    Board board;
     Bag bag;
+    Board board;
     Player player;
 
     SDL_Point boardStart;
