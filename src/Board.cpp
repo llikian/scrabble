@@ -143,20 +143,52 @@ void Board::findBestMove(Player& player) {
     std::string word;
 
     std::stack<State> stack;
+    Position position;
     Node* node = nullptr;
 
-    for(Spot* spot: startPositions) {
+    auto handleState = [&](const Spot& spot, const State& state) {
+        if(board[state.position.x][state.position.y].character == '\0') { // The spot doesn't have a letter on it
+            for(unsigned int i = 0 ; i < state.letters.size() ; ++i) { // Iterate over the letters in the hand
+                node = state.node->children[state.letters[i] - 'A'];
+
+                if(node != nullptr) { // There is a child of the current node with the current letter as its label
+                    // Add the state with the moved cursors and without the current letter in the hand
+                    stack.emplace(position, node, std::vector<char>());
+
+                    for(unsigned int j = 0 ; j < state.letters.size() ; ++j) {
+                        if(j != i) {
+                            stack.top().letters.push_back(state.letters[j]);
+                        }
+                    }
+                }
+            }
+
+            node = state.node->children[ALPHABET_SIZE];
+            if(node != nullptr) {
+                stack.emplace(Position(spot.position.x + 1, spot.position.y), node, state.letters);
+            }
+        } else { // The spot already has a letter on it.
+            node = state.node->children[board[state.position.x][state.position.y].character - 'A'];
+            if(node != nullptr) { // There is a child of the current node with this letter as its label
+                // Add the state with the moved cursors and with the same hand because we didn't play any letter
+                stack.emplace(position, node, state.letters);
+            }
+        }
+    };
+
+    for(Spot* spot : startPositions) {
         // Add initial state to stack
-        stack.emplace(spot->position, dictionay.root, std::vector<char>());
+        State init(spot->position, dictionay.root, std::vector<char>());
         for(char letter: player.hand) {
-            stack.top().letters.push_back(letter);
+            init.letters.push_back(letter);
         }
 
-        while(!stack.empty()) {
+        stack.push(init);
+        while(!stack.empty()) { // Vertical
             State state = stack.top();
             stack.pop();
 
-            Position position = state.position;
+            position = state.position;
             if(state.position.x <= spot->position.x) { // We haven't found a '+' yet
                 if(state.position.x == 0) { continue; }
                 --position.x;
@@ -165,33 +197,24 @@ void Board::findBestMove(Player& player) {
                 ++position.x;
             }
 
-            if(board[state.position.x][state.position.y].character == '\0') { // The spot doesn't have a letter on it
-                for(unsigned int i = 0 ; i < state.letters.size() ; ++i) { // Iterate over the letters in the hand
-                    node = state.node->children[state.letters[i] - 'A'];
+            handleState(*spot, state);
+        }
 
-                    if(node != nullptr) { // There is a child of the current node with the current letter as its label
-                        // Add the state with the moved cursors and without the current letter in the hand
-                        stack.emplace(position, node, std::vector<char>());
+        stack.push(init);
+        while(!stack.empty()) { // Horizontal
+            State state = stack.top();
+            stack.pop();
 
-                        for(unsigned int j = 0 ; j < state.letters.size() ; ++j) {
-                            if(j != i) {
-                                stack.top().letters.push_back(state.letters[j]);
-                            }
-                        }
-                    }
-                }
-
-                node = state.node->children[ALPHABET_SIZE];
-                if(node != nullptr) {
-                    stack.emplace(Position(spot->position.x + 1, spot->position.y), node, state.letters);
-                }
-            } else { // The spot already has a letter on it.
-                node = state.node->children[board[state.position.x][state.position.y].character - 'A'];
-                if(node != nullptr) { // There is a child of the current node with this letter as its label
-                    // Add the state with the moved cursors and with the same hand because we didn't play any letter
-                    stack.emplace(position, node, state.letters);
-                }
+            position = state.position;
+            if(state.position.y <= spot->position.y) { // We haven't found a '+' yet
+                if(state.position.y == 0) { continue; }
+                --position.y;
+            } else { // We have already passed a '+' in the GADDAG so we move right
+                if(state.position.y == BOARD_SIZE - 1) { continue; }
+                ++position.y;
             }
+
+            handleState(*spot, state);
         }
     }
 }

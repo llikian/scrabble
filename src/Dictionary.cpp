@@ -13,6 +13,12 @@
 
 Node::Node(const char value, const bool isTerminal) : value(value), isTerminal(isTerminal), children{} { }
 
+Node::~Node() {
+    for(Node* child : children) {
+        delete child;
+    }
+}
+
 Dictionary::Dictionary() : root(new Node('\0', false)) { }
 
 Dictionary::Dictionary(const std::string& loadPath) : root(new Node('\0', false)) {
@@ -125,7 +131,7 @@ void Dictionary::unitTests() {
         std::cout << "  File insertion test passes!\n";
     }
 
-    /* GADDAG Insertion Test */ {
+    /* Full Dictionary Test */ {
         Dictionary dico("data/dico.txt");
 
         assert(dico.containWord("F+ROMAGE"));
@@ -134,11 +140,6 @@ void Dictionary::unitTests() {
         assert(!dico.containWord("A"));
         assert(!dico.containWord("ABC"));
 
-        std::cout << "  Gaddag insertion test passes!\n";
-    }
-
-    /* Full Dictionary Test */ {
-        Dictionary dico("data/dico.txt");
         std::ifstream file("data/dico.txt");
         std::string word;
 
