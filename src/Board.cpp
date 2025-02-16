@@ -139,14 +139,32 @@ void Board::findBestMove(Player& player) {
         std::vector<char> letters;
     };
 
+    std::stack<State> stack;
     std::vector<std::pair<Position, std::string>> words;
     std::string word;
 
-    std::stack<State> stack;
-    Position position;
-    Node* node = nullptr;
+    auto handleState = [this, &stack](const Spot* spot, const State& state, bool vertical) -> void {
+        Position position = state.position;
+        Node* node = nullptr;
 
-    auto handleState = [&](const Spot& spot, const State& state) {
+        if(vertical) {
+            if(state.position.x <= spot->position.x) { // We haven't found a '+' yet
+                if(state.position.x == 0) { return; }
+                --position.x;
+            } else { // We have already passed a '+' in the GADDAG so we move right
+                if(state.position.x == BOARD_SIZE - 1) { return; }
+                ++position.x;
+            }
+        } else {
+            if(state.position.y <= spot->position.y) { // We haven't found a '+' yet
+                if(state.position.y == 0) { return; }
+                --position.y;
+            } else { // We have already passed a '+' in the GADDAG so we move right
+                if(state.position.y == BOARD_SIZE - 1) { return; }
+                ++position.y;
+            }
+        }
+
         if(board[state.position.x][state.position.y].character == '\0') { // The spot doesn't have a letter on it
             for(unsigned int i = 0 ; i < state.letters.size() ; ++i) { // Iterate over the letters in the hand
                 node = state.node->children[state.letters[i] - 'A'];
@@ -165,7 +183,11 @@ void Board::findBestMove(Player& player) {
 
             node = state.node->children[ALPHABET_SIZE];
             if(node != nullptr) {
-                stack.emplace(Position(spot.position.x + 1, spot.position.y), node, state.letters);
+                if(vertical) {
+                    stack.emplace(Position(spot->position.x + 1, spot->position.y), node, state.letters);
+                } else {
+                    stack.emplace(Position(spot->position.x, spot->position.y + 1), node, state.letters);
+                }
             }
         } else { // The spot already has a letter on it.
             node = state.node->children[board[state.position.x][state.position.y].character - 'A'];
@@ -176,45 +198,27 @@ void Board::findBestMove(Player& player) {
         }
     };
 
-    for(Spot* spot : startPositions) {
+    for(Spot* spot: startPositions) {
         // Add initial state to stack
         State init(spot->position, dictionay.root, std::vector<char>());
         for(char letter: player.hand) {
             init.letters.push_back(letter);
         }
 
+        // Check for words vertically
         stack.push(init);
-        while(!stack.empty()) { // Vertical
-            State state = stack.top();
+        while(!stack.empty()) {
+            State top = stack.top();
             stack.pop();
-
-            position = state.position;
-            if(state.position.x <= spot->position.x) { // We haven't found a '+' yet
-                if(state.position.x == 0) { continue; }
-                --position.x;
-            } else { // We have already passed a '+' in the GADDAG so we move right
-                if(state.position.x == BOARD_SIZE - 1) { continue; }
-                ++position.x;
-            }
-
-            handleState(*spot, state);
+            handleState(spot, top, true);
         }
 
+        // Check for words horizontally
         stack.push(init);
-        while(!stack.empty()) { // Horizontal
-            State state = stack.top();
+        while(!stack.empty()) {
+            State top = stack.top();
             stack.pop();
-
-            position = state.position;
-            if(state.position.y <= spot->position.y) { // We haven't found a '+' yet
-                if(state.position.y == 0) { continue; }
-                --position.y;
-            } else { // We have already passed a '+' in the GADDAG so we move right
-                if(state.position.y == BOARD_SIZE - 1) { continue; }
-                ++position.y;
-            }
-
-            handleState(*spot, state);
+            handleState(spot, top, false);
         }
     }
 }
