@@ -9,7 +9,6 @@
 #include <stdexcept>
 #include <iostream>
 #include <unordered_set>
-#include <stack>
 
 Board::Board(const Bag& bag, const Dictionary& dictionary) : bag(bag), dictionay(dictionary) {
     static const char rawBoard[BOARD_SIZE][BOARD_SIZE + 1]{
@@ -109,6 +108,91 @@ BonusType Board::getBonusType(int row, int column) {
     return board[row][column].type;
 }
 
+Move* Board::handleStackState(std::stack<State>& stack, const Spot* spot, const State& state, Direction direction) {
+    Position position = state.position;
+    Node* node = nullptr;
+
+    if(direction == HORIZONTAL) {
+        if(state.position.x <= spot->position.x) { // We haven't found a '+' yet
+            if(state.position.x == 0) {
+                // TODO : Replace return with test if a correct word was found
+                return nullptr;
+            }
+
+            --position.x;
+        } else { // We have already passed a '+' in the GADDAG so we move right
+            if(state.position.x == BOARD_SIZE - 1) {
+                // TODO : Replace return with test if a correct word was found
+                return nullptr;
+            }
+
+            ++position.x;
+        }
+    } else { // VERTICAL
+        if(state.position.y <= spot->position.y) { // We haven't found a '+' yet
+            if(state.position.y == 0) {
+                // TODO : Replace return with test if a correct word was found
+                return nullptr;
+            }
+
+            --position.y;
+        } else { // We have already passed a '+' in the GADDAG so we move right
+            if(state.position.y == BOARD_SIZE - 1) {
+                // TODO : Replace return with test if a correct word was found
+                return nullptr;
+            }
+
+            ++position.y;
+        }
+    }
+
+    if(board[state.position.x][state.position.y].character == '\0') { // The spot doesn't have a letter on it
+        if(state.node->isTerminal) {
+            std::string word;
+
+            if(direction == HORIZONTAL) {
+                // TODO : write code
+            } else { // VERTICAL
+                // TODO : write code
+            }
+
+            return new Move(spot->position, direction, word);
+        }
+
+        for(unsigned int i = 0 ; i < state.letters.size() ; ++i) { // Iterate over the letters in the hand
+            node = state.node->children[state.letters[i] - 'A'];
+
+            if(node != nullptr) { // There is a child of the current node with the current letter as its label
+                // Add the state with the moved cursors and without the current letter in the hand
+                stack.emplace(position, node, std::vector<char>());
+
+                for(unsigned int j = 0 ; j < state.letters.size() ; ++j) {
+                    if(j != i) {
+                        stack.top().letters.push_back(state.letters[j]);
+                    }
+                }
+            }
+        }
+
+        node = state.node->children[ALPHABET_SIZE];
+        if(node != nullptr) {
+            if(direction == HORIZONTAL) {
+                stack.emplace(Position(spot->position.x + 1, spot->position.y), node, state.letters);
+            } else { // VERTICAL
+                stack.emplace(Position(spot->position.x, spot->position.y + 1), node, state.letters);
+            }
+        }
+    } else { // The spot already has a letter on it.
+        node = state.node->children[board[state.position.x][state.position.y].character - 'A'];
+        if(node != nullptr) { // There is a child of the current node with this letter as its label
+            // Add the state with the moved cursors and with the same hand because we didn't play any letter
+            stack.emplace(position, node, state.letters);
+        }
+    }
+
+    return nullptr;
+}
+
 void Board::findBestMove(Player& player) {
     /* ---- Find possible start positions ---- */
     std::unordered_set<Spot*> startPositions;
@@ -133,70 +217,9 @@ void Board::findBestMove(Player& player) {
     }
 
     /* ---- Find all possible words ---- */
-    struct State {
-        Position position;
-        Node* node;
-        std::vector<char> letters;
-    };
-
     std::stack<State> stack;
-    std::vector<std::pair<Position, std::string>> words;
-    std::string word;
-
-    auto handleState = [this, &stack](const Spot* spot, const State& state, bool vertical) -> void {
-        Position position = state.position;
-        Node* node = nullptr;
-
-        if(vertical) {
-            if(state.position.x <= spot->position.x) { // We haven't found a '+' yet
-                if(state.position.x == 0) { return; }
-                --position.x;
-            } else { // We have already passed a '+' in the GADDAG so we move right
-                if(state.position.x == BOARD_SIZE - 1) { return; }
-                ++position.x;
-            }
-        } else {
-            if(state.position.y <= spot->position.y) { // We haven't found a '+' yet
-                if(state.position.y == 0) { return; }
-                --position.y;
-            } else { // We have already passed a '+' in the GADDAG so we move right
-                if(state.position.y == BOARD_SIZE - 1) { return; }
-                ++position.y;
-            }
-        }
-
-        if(board[state.position.x][state.position.y].character == '\0') { // The spot doesn't have a letter on it
-            for(unsigned int i = 0 ; i < state.letters.size() ; ++i) { // Iterate over the letters in the hand
-                node = state.node->children[state.letters[i] - 'A'];
-
-                if(node != nullptr) { // There is a child of the current node with the current letter as its label
-                    // Add the state with the moved cursors and without the current letter in the hand
-                    stack.emplace(position, node, std::vector<char>());
-
-                    for(unsigned int j = 0 ; j < state.letters.size() ; ++j) {
-                        if(j != i) {
-                            stack.top().letters.push_back(state.letters[j]);
-                        }
-                    }
-                }
-            }
-
-            node = state.node->children[ALPHABET_SIZE];
-            if(node != nullptr) {
-                if(vertical) {
-                    stack.emplace(Position(spot->position.x + 1, spot->position.y), node, state.letters);
-                } else {
-                    stack.emplace(Position(spot->position.x, spot->position.y + 1), node, state.letters);
-                }
-            }
-        } else { // The spot already has a letter on it.
-            node = state.node->children[board[state.position.x][state.position.y].character - 'A'];
-            if(node != nullptr) { // There is a child of the current node with this letter as its label
-                // Add the state with the moved cursors and with the same hand because we didn't play any letter
-                stack.emplace(position, node, state.letters);
-            }
-        }
-    };
+    std::vector<Move*> moves; // Defined on the heap so need deleting
+    Move* move;
 
     for(Spot* spot: startPositions) {
         // Add initial state to stack
@@ -205,20 +228,30 @@ void Board::findBestMove(Player& player) {
             init.letters.push_back(letter);
         }
 
-        // Check for words vertically
-        stack.push(init);
-        while(!stack.empty()) {
-            State top = stack.top();
-            stack.pop();
-            handleState(spot, top, true);
-        }
-
         // Check for words horizontally
         stack.push(init);
         while(!stack.empty()) {
             State top = stack.top();
             stack.pop();
-            handleState(spot, top, false);
+
+            move = handleStackState(stack, spot, top, HORIZONTAL);
+
+            if(move != nullptr) {
+                moves.push_back(move);
+            }
+        }
+
+        // Check for words vertically
+        stack.push(init);
+        while(!stack.empty()) {
+            State top = stack.top();
+            stack.pop();
+
+            move = handleStackState(stack, spot, top, VERTICAL);
+
+            if(move != nullptr) {
+                moves.push_back(move);
+            }
         }
     }
 }

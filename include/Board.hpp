@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <stack>
 #include <string>
 #include <vector>
 #include "Bag.hpp"
@@ -13,6 +14,23 @@
 #include "Spot.hpp"
 
 #define BOARD_SIZE 15
+
+enum Direction : bool {
+    VERTICAL,
+    HORIZONTAL
+};
+
+struct State {
+    Position position;
+    Node* node;
+    std::vector<char> letters;
+};
+
+struct Move {
+    Position start; // Position where the search started
+    Direction direction;
+    std::string word; // Word as it is in the gaddag
+};
 
 /**
  * @struct Board
@@ -33,4 +51,6 @@ private:
     Spot board[BOARD_SIZE][BOARD_SIZE];
     const Bag& bag;
     const Dictionary& dictionay;
+
+    Move* handleStackState(std::stack<State>& stack, const Spot* spot, const State& state, Direction direction);
 };
