@@ -61,13 +61,10 @@ void Dictionary::insertWord(const std::string& word) {
 }
 
 void Dictionary::insertGADDAGWord(const std::string& word) {
-    int len = word.length();
-
-    std::string gaddagWord = word;
-    gaddagWord.insert(0, "+");
+    std::string gaddagWord = '+' + word;
 
     // For each letter in the word, create a word by mirroring it around the '+'
-    for(int i = 1 ; i <= len ; i++) {
+    for(unsigned int i = 1 ; i < gaddagWord.length() ; i++) {
         std::rotate(gaddagWord.begin(), gaddagWord.begin() + i, gaddagWord.begin() + i + 1);
 
         insertWord(gaddagWord);
