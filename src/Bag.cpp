@@ -6,10 +6,9 @@
 #include "Bag.hpp"
 
 #include <iostream>
+#include <random>
 
 Bag::Bag() : letters(nullptr), size(0) {
-    srand(time(nullptr));
-
     unsigned int totalLetters = 0;
     for(unsigned int letterCount: letterCounts) {
         totalLetters += letterCount;
@@ -29,15 +28,11 @@ Bag::Bag() : letters(nullptr), size(0) {
 
     /* Shuffle using the Fisher-Yates method:
      * https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_modern_algorithm
-     */
-    int index;
-    char tmp;
-    for(int i = size - 1 ; i >= 1 ; --i) {
-        index = rand() % (i + 1);
-
-        tmp = letters[i];
-        letters[i] = letters[index];
-        letters[index] = tmp;
+    */
+    std::random_device device;
+    std::default_random_engine rng(device());
+    for(int i = size - 1 ; i > 0 ; --i) {
+        std::swap(letters[i], letters[std::uniform_int_distribution<int>(0, i)(rng)]);
     }
 }
 
@@ -50,10 +45,7 @@ char Bag::drawLetter() {
         return '\0';
     }
 
-    char letter = letters[size];
-    --size;
-
-    return letter;
+    return letters[--size];
 }
 
 unsigned int Bag::getPoints(char letter) const {
