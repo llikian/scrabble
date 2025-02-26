@@ -8,12 +8,9 @@
 #include <string>
 #include "Bag.hpp"
 
-#define LOWERCASE_TO_UPPERCASE(l) l -= 32
-
 struct Node {
     char value;
     bool isTerminal;
-    Node* children[ALPHABET_SIZE + 1]; // +1 for '+' character
 
     Node(char value, bool isTerminal);
 
@@ -21,6 +18,12 @@ struct Node {
     void operator=(const Node&) = delete;
 
     ~Node();
+
+    Node*& operator[](char letter);
+    Node*& getChild(char letter);
+
+private:
+    Node* children[ALPHABET_SIZE + 1]; // +1 for '+' character
 };
 
 //Trie structure
@@ -36,7 +39,7 @@ public:
     void operator=(const Dictionary&) = delete;
 
     void insertGADDAGWord(const std::string& word);
-    bool containWord(const std::string& word);
+    bool containWord(const std::string& word) const;
 
     static void unitTests();
 private:

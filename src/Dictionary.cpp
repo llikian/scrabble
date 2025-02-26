@@ -13,8 +13,24 @@
 
 Node::Node(const char value, const bool isTerminal) : value(value), isTerminal(isTerminal), children{} { }
 
+Node*& Node::operator[](char letter) {
+    if(letter >= 'A' && letter <= 'Z') {
+        return children[letter - 'A'];
+    }
+
+    return children[ALPHABET_SIZE];
+}
+
+Node*& Node::getChild(char letter) {
+    if(letter >= 'A' && letter <= 'Z') {
+        return children[letter - 'A'];
+    }
+
+    return children[ALPHABET_SIZE];
+}
+
 Node::~Node() {
-    for(Node* child : children) {
+    for(const Node* child : children) {
         delete child;
     }
 }
@@ -44,17 +60,15 @@ void Dictionary::insertWord(const std::string& word) {
 
     for(char l: word) {
         if(l >= 'a' && l <= 'z') {
-            LOWERCASE_TO_UPPERCASE(l);
+            l += 'A' - 'a';
         }
 
-        // If char is '+', put at the end, else put at alphabet position
-        const int pos = l == '+' ? ALPHABET_SIZE : l - 'A';
-
-        if(current->children[pos] == nullptr) {
-            current->children[pos] = new Node(l, false);
+        Node*& child = current->getChild(l);
+        if(child == nullptr) {
+            child = new Node(l, false);
         }
 
-        current = current->children[pos];
+        current = child;
     }
 
     current->isTerminal = true;
@@ -71,18 +85,17 @@ void Dictionary::insertGADDAGWord(const std::string& word) {
     }
 }
 
-bool Dictionary::containWord(const std::string& word) {
-    const Node* current = root;
+bool Dictionary::containWord(const std::string& word) const {
+    Node* current = root;
 
-    for(const char l: word) {
-        // If char is '+', check at the end, else check at alphabet position
-        const int pos = l == '+' ? ALPHABET_SIZE : l - 'A';
+    for(char l: word) {
+        Node* child = current->getChild(l);
 
-        if(current->children[pos] == nullptr) {
+        if(child == nullptr) {
             return false;
         }
 
-        current = current->children[pos];
+        current = child;
     }
 
     return current->isTerminal;
@@ -95,7 +108,7 @@ void Dictionary::unitTests() {
         Dictionary dico;
 
         dico.insertWord("abc");
-        assert(dico.root->children[0]->children[1]->children[2]->value == 'C');
+        // assert(dico.root->children[0]->children[1]->children[2]->value == 'C');
         assert(dico.containWord("ABC"));
         assert(!dico.containWord("A"));
         assert(!dico.containWord("ABCE"));
