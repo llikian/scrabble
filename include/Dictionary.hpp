@@ -16,6 +16,10 @@ struct Node {
     Node* children[ALPHABET_SIZE + 1]; // +1 for '+' character
 
     Node(char value, bool isTerminal);
+
+    Node(const Node&) = delete;
+    void operator=(const Node&) = delete;
+
     ~Node();
 };
 

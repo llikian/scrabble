@@ -20,10 +20,50 @@ enum Direction : bool {
     HORIZONTAL
 };
 
+struct Hand {
+    Hand(const Player& player)
+        : capacity(player.capacity) {
+        for(int i = 0 ; i < capacity ; ++i) {
+            letters[i] = player.hand[i];
+        }
+    }
+
+    Hand(const Hand& hand)
+        : capacity(hand.capacity) {
+        for(int i = 0 ; i < capacity ; ++i) {
+            letters[i] = hand.letters[i];
+        }
+    }
+
+    Hand(const Hand& hand, int removedLetterIndex)
+        : capacity(0) {
+        for(int i = 0 ; i < hand.capacity ; ++i) {
+            if(i != removedLetterIndex) {
+                letters[capacity] = hand.letters[i];
+                capacity++;
+            }
+        }
+    }
+
+    void operator=(const Hand& hand) {
+        capacity = hand.capacity;
+
+        for(int i = 0 ; i < capacity ; ++i) {
+            letters[i] = hand.letters[i];
+        }
+    }
+
+    char letters[7];
+    int capacity;
+};
+
 struct State {
+    State(const Position& position, Node* node, const Hand& hand) : position(position), node(node), hand(hand) { }
+
     Position position;
     Node* node;
-    std::vector<char> letters;
+    std::string word; // Word as it is in the gaddag
+    Hand hand;
 };
 
 struct Move {
@@ -44,13 +84,12 @@ public:
     void saveToFile(const std::string& path) const;
 
     char& operator ()(int row, int column);
-    BonusType getBonusType(int row, int column);
+    BonusType getBonusType(int row, int column) const;
 
     void findBestMove(Player& player);
+
 private:
     Spot board[BOARD_SIZE][BOARD_SIZE];
     const Bag& bag;
     const Dictionary& dictionay;
-
-    Move* handleStackState(std::stack<State>& stack, const Spot* spot, const State& state, Direction direction);
 };
