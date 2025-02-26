@@ -6,6 +6,8 @@
 #pragma once
 
 #include <string>
+#include <vector>
+
 #include "Bag.hpp"
 #include "Dictionary.hpp"
 #include "Player.hpp"
@@ -14,8 +16,8 @@
 #define BOARD_SIZE 15
 
 enum Direction : bool {
-    VERTICAL,
-    HORIZONTAL
+    VERTICAL, //0
+    HORIZONTAL //1
 };
 
 struct Hand {
@@ -61,6 +63,7 @@ public:
     BonusType getBonusType(int row, int column) const;
 
     void findBestMove(Player& player);
+    void checkForWords(Player& player, const Spot* startSpot, std::vector<Move>& moves, const Direction& direction);
 
 private:
     Spot board[BOARD_SIZE][BOARD_SIZE];

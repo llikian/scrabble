@@ -10,7 +10,6 @@
 #include <stack>
 #include <stdexcept>
 #include <unordered_set>
-#include <vector>
 
 Hand::Hand(const Player& player)
     : capacity(player.capacity) {
@@ -153,6 +152,57 @@ BonusType Board::getBonusType(int row, int column) const {
     return board[row][column].type;
 }
 
+void Board::checkForWords(Player& player, const Spot* startSpot, std::vector<Move>& moves, const Direction& direction)
+{
+    std::stack<State> stack;
+
+    State init(startSpot->position, dictionay.root, "", Hand(player));
+    stack.push(init);
+    while(!stack.empty()) {
+        const State top = stack.top();
+        stack.pop();
+
+        const Spot& spot = board[top.position.x][top.position.y];
+
+        if(spot.character == '\0') { // Spot is empty
+            // We found a correct word
+            if(top.node->isTerminal) {
+                moves.emplace_back(startSpot->position, direction, top.word);
+            }
+
+            // There is a path labeled with a '+' in the GADDAG
+            if(Node* node = top.node->getChild('+') ; node != nullptr) {
+                // Add 1 to current direction
+                Position pos(startSpot->position.x + direction, startSpot->position.y + !direction); //OK
+                stack.emplace(pos, node, top.word + '+', top.hand, true);
+            }
+
+            // Create a new state on the stack for each letter from the hand that could be placed
+            for(int i = 0 ; i < top.hand.capacity ; ++i) {
+                if(Node* node = top.node->getChild(top.hand.letters[i]) ; node != nullptr) {
+                    Position position = direction
+                        ? Position(top.position.x + (top.foundPlus ? 1 : -1), top.position.y)
+                        : Position(top.position.x, top.position.y + top.foundPlus ? 1 : -1); //OK
+
+                    if(direction ? top.position.x : top.position.y < BOARD_SIZE) { //OK
+                        stack.emplace(position, node, top.word + top.hand.letters[i], Hand(top.hand, i));
+                    }
+                }
+            }
+        } else if(Node* node = top.node->getChild(spot.character) ; node != nullptr) {
+            // There is a path labeled with the letter on the spot in the GADDAG
+            Position position = direction
+                ? Position(top.position.x + (top.foundPlus ? 1 : -1), top.position.y)
+                : Position(top.position.x, top.position.y + (top.foundPlus ? 1 : -1)); //OK
+
+
+            if(direction ? top.position.x : top.position.y < BOARD_SIZE) { //OK
+                stack.emplace(position, node, top.word + spot.character, top.hand);
+            }
+        }
+    }
+}
+
 void Board::findBestMove(Player& player) {
     /* ---- Find possible start positions ---- */
     std::unordered_set<const Spot*> startPositions;
@@ -177,95 +227,10 @@ void Board::findBestMove(Player& player) {
         }
     }
 
-    /* ---- Find all possible words ---- */
-    std::stack<State> stack;
-    std::vector<Move> moves; // Defined on the heap so need deleting
-
+    std::vector<Move> moves;
     for(const Spot* startSpot : startPositions) {
-        // Add initial state to stack
-        State init(startSpot->position, dictionay.root, "", Hand(player));
-
-        // Check for words horizontally
-        stack.push(init);
-        while(!stack.empty()) {
-            const State top = stack.top();
-            stack.pop();
-
-            const Spot& spot = board[top.position.x][top.position.y];
-
-            if(spot.character == '\0') { // Spot is empty
-                // We found a correct word
-                if(top.node->isTerminal) {
-                    moves.emplace_back(startSpot->position, HORIZONTAL, top.word);
-                }
-
-                // There is a path labeled with a '+' in the GADDAG
-                if(Node* node = top.node->getChild('+') ; node != nullptr) {
-                    Position pos(startSpot->position.x + 1, startSpot->position.y);
-                    stack.emplace(pos, node, top.word + '+', top.hand, true);
-                }
-
-                // Create a new state on the stack for each letter from the hand that could be placed
-                for(int i = 0 ; i < top.hand.capacity ; ++i) {
-                    if(Node* node = top.node->getChild(top.hand.letters[i]) ; node != nullptr) {
-                        Position position(top.position.x + top.foundPlus ? 1 : -1, top.position.y);
-
-                        if(top.position.x < BOARD_SIZE) {
-                            stack.emplace(position, node, top.word + top.hand.letters[i], Hand(top.hand, i));
-                        }
-                    }
-                }
-            } else if(Node* node = top.node->getChild(spot.character) ; node != nullptr) {
-                // There is a path labeled with the letter on the spot in the GADDAG
-                Position position(top.position.x + top.foundPlus ? 1 : -1, top.position.y);
-
-                if(top.position.x < BOARD_SIZE) {
-                    stack.emplace(position, node, top.word + spot.character, top.hand);
-                }
-            }
-        }
-
-        // Check for words vertically
-        stack.push(init);
-        while(!stack.empty()) {
-            State top = stack.top();
-            stack.pop();
-
-            const Spot& spot = board[top.position.x][top.position.y];
-
-            if(spot.character == '\0') { // Spot is empty
-                // We found a correct word
-                if(top.node->isTerminal) {
-                    moves.emplace_back(startSpot->position, VERTICAL, top.word);
-                }
-
-                // There is a path labeled with a '+' in the GADDAG
-                if(Node* node = top.node->getChild('+') ; node != nullptr) {
-                    Position position(startSpot->position.x, startSpot->position.y + 1);
-                    stack.emplace(position, node, top.word + '+', top.hand, true);
-                }
-
-                // Create a new state on the stack for each letter from the hand that could be placed
-                for(int i = 0 ; i < top.hand.capacity ; ++i) {
-                    char letter = top.hand.letters[i];
-
-                    if(Node* node = top.node->getChild(letter) ; node != nullptr) {
-                        Position position(top.position.x, top.position.y + top.foundPlus ? 1 : -1);
-
-                        if(top.position.y < BOARD_SIZE) {
-                            stack.emplace(position, node, top.word + letter, Hand(top.hand, i), top.foundPlus);
-                        }
-                    }
-                }
-            } else if(Node* node = top.node->getChild(spot.character) ; node != nullptr) {
-                // There is a path labeled with the letter on the spot in the GADDAG
-                Position position(top.position.x, top.position.y + top.foundPlus ? 1 : -1);
-
-                if(top.position.y < BOARD_SIZE) {
-                    stack.emplace(position, node, top.word + spot.character, top.hand, top.foundPlus);
-                }
-            }
-        }
+        checkForWords(player, startSpot, moves, HORIZONTAL);
+        checkForWords(player, startSpot, moves, VERTICAL); //TODO Faire marcher ça
     }
 
     for(const auto& [start, direction, word] : moves) {
