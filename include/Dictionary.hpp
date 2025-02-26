@@ -42,6 +42,7 @@ public:
     bool containWord(const std::string& word) const;
 
     static void unitTests();
+
 private:
     void insertWord(const std::string& word);
 };

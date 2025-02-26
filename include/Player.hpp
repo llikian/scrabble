@@ -14,7 +14,6 @@
  * @brief
  */
 struct Player {
-public:
     Player(Bag& bag);
 
     Bag& bag;

@@ -6,11 +6,56 @@
 #include "Board.hpp"
 
 #include <fstream>
-#include <stdexcept>
 #include <iostream>
+#include <stack>
+#include <stdexcept>
 #include <unordered_set>
+#include <vector>
 
-Board::Board(const Bag& bag, const Dictionary& dictionary) : bag(bag), dictionay(dictionary) {
+Hand::Hand(const Player& player)
+    : capacity(player.capacity) {
+
+    for(int i = 0 ; i < capacity ; ++i) {
+        letters[i] = player.hand[i];
+    }
+}
+
+Hand::Hand(const Hand& hand)
+    : capacity(hand.capacity) {
+
+    for(int i = 0 ; i < capacity ; ++i) {
+        letters[i] = hand.letters[i];
+    }
+}
+
+Hand::Hand(const Hand& hand, int removedLetterIndex)
+    : capacity(0) {
+
+    for(int i = 0 ; i < hand.capacity ; ++i) {
+        if(i != removedLetterIndex) {
+            letters[capacity] = hand.letters[i];
+            capacity++;
+        }
+    }
+}
+
+void Hand::operator=(const Hand& hand) {
+    capacity = hand.capacity;
+
+    for(int i = 0 ; i < capacity ; ++i) {
+        letters[i] = hand.letters[i];
+    }
+}
+
+State::State(const Position& position, Node* node, const std::string& word, const Hand& hand)
+    : position(position), node(node), word(word), hand(hand), foundPlus(false) { }
+
+State::State(const Position& position, Node* node, const std::string& word, const Hand& hand, bool foundPlus)
+    : position(position), node(node), word(word), hand(hand), foundPlus(foundPlus) { }
+
+Board::Board(const Bag& bag, const Dictionary& dictionary)
+    : bag(bag), dictionay(dictionary) {
+
     static constexpr char rawBoard[BOARD_SIZE][BOARD_SIZE + 1]{
         "3..d...3...d..3",
         ".2...t...t...2.",
@@ -110,7 +155,7 @@ BonusType Board::getBonusType(int row, int column) const {
 
 void Board::findBestMove(Player& player) {
     /* ---- Find possible start positions ---- */
-    std::unordered_set<Spot*> startPositions;
+    std::unordered_set<const Spot*> startPositions;
 
     for(int i = 0 ; i < BOARD_SIZE ; ++i) {
         for(int j = 0 ; j < BOARD_SIZE ; ++j) {
@@ -123,7 +168,8 @@ void Board::findBestMove(Player& player) {
         }
     }
 
-    if(startPositions.empty()) { // No starting positions were found
+    // No starting positions were found
+    if(startPositions.empty()) {
         if(board[8][8].character == '\0') { // This is the first move
             startPositions.emplace(&board[8][8]);
         } else { // The game is over
@@ -135,16 +181,48 @@ void Board::findBestMove(Player& player) {
     std::stack<State> stack;
     std::vector<Move> moves; // Defined on the heap so need deleting
 
-    for(const Spot* spot: startPositions) {
+    for(const Spot* startSpot : startPositions) {
         // Add initial state to stack
-        State init(spot->position, dictionay.root, Hand(player));
+        State init(startSpot->position, dictionay.root, "", Hand(player));
 
         // Check for words horizontally
         stack.push(init);
         while(!stack.empty()) {
-            State top = stack.top();
+            const State top = stack.top();
             stack.pop();
 
+            const Spot& spot = board[top.position.x][top.position.y];
+
+            if(spot.character == '\0') { // Spot is empty
+                // We found a correct word
+                if(top.node->isTerminal) {
+                    moves.emplace_back(startSpot->position, HORIZONTAL, top.word);
+                }
+
+                // There is a path labeled with a '+' in the GADDAG
+                if(Node* node = top.node->getChild('+') ; node != nullptr) {
+                    Position pos(startSpot->position.x + 1, startSpot->position.y);
+                    stack.emplace(pos, node, top.word + '+', top.hand, true);
+                }
+
+                // Create a new state on the stack for each letter from the hand that could be placed
+                for(int i = 0 ; i < top.hand.capacity ; ++i) {
+                    if(Node* node = top.node->getChild(top.hand.letters[i]) ; node != nullptr) {
+                        Position position(top.position.x + top.foundPlus ? 1 : -1, top.position.y);
+
+                        if(top.position.x < BOARD_SIZE) {
+                            stack.emplace(position, node, top.word + top.hand.letters[i], Hand(top.hand, i));
+                        }
+                    }
+                }
+            } else if(Node* node = top.node->getChild(spot.character) ; node != nullptr) {
+                // There is a path labeled with the letter on the spot in the GADDAG
+                Position position(top.position.x + top.foundPlus ? 1 : -1, top.position.y);
+
+                if(top.position.x < BOARD_SIZE) {
+                    stack.emplace(position, node, top.word + spot.character, top.hand);
+                }
+            }
         }
 
         // Check for words vertically
@@ -153,7 +231,46 @@ void Board::findBestMove(Player& player) {
             State top = stack.top();
             stack.pop();
 
+            const Spot& spot = board[top.position.x][top.position.y];
 
+            if(spot.character == '\0') { // Spot is empty
+                // We found a correct word
+                if(top.node->isTerminal) {
+                    moves.emplace_back(startSpot->position, VERTICAL, top.word);
+                }
+
+                // There is a path labeled with a '+' in the GADDAG
+                if(Node* node = top.node->getChild('+') ; node != nullptr) {
+                    Position position(startSpot->position.x, startSpot->position.y + 1);
+                    stack.emplace(position, node, top.word + '+', top.hand, true);
+                }
+
+                // Create a new state on the stack for each letter from the hand that could be placed
+                for(int i = 0 ; i < top.hand.capacity ; ++i) {
+                    char letter = top.hand.letters[i];
+
+                    if(Node* node = top.node->getChild(letter) ; node != nullptr) {
+                        Position position(top.position.x, top.position.y + top.foundPlus ? 1 : -1);
+
+                        if(top.position.y < BOARD_SIZE) {
+                            stack.emplace(position, node, top.word + letter, Hand(top.hand, i), top.foundPlus);
+                        }
+                    }
+                }
+            } else if(Node* node = top.node->getChild(spot.character) ; node != nullptr) {
+                // There is a path labeled with the letter on the spot in the GADDAG
+                Position position(top.position.x, top.position.y + top.foundPlus ? 1 : -1);
+
+                if(top.position.y < BOARD_SIZE) {
+                    stack.emplace(position, node, top.word + spot.character, top.hand, top.foundPlus);
+                }
+            }
         }
+    }
+
+    for(const auto& [start, direction, word] : moves) {
+        std::cout << (direction ? "[V] " : "[H] ");
+        std::cout << '(' << start.x << ", " << start.y << ") ";
+        std::cout << word << '\n';
     }
 }

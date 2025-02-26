@@ -41,6 +41,7 @@ Application::Application()
         throw std::runtime_error(std::string("Couldn't open font: ") + SDL_GetError());
     }
 
+    SDL_SetWindowMinimumSize(window, width, height);
     handleResize();
 
     board.loadFromFile("data/boards/board1.txt");
@@ -63,6 +64,7 @@ void Application::run() {
         SDL_RenderClear(renderer);
 
         drawBoard();
+        drawHand();
         drawText(5, 5, score + std::to_string(player.points), 238, 195, 166);
 
         SDL_RenderPresent(renderer);
@@ -240,5 +242,23 @@ void Application::drawBoard() {
     for(int i = 0 ; i <= BOARD_SIZE ; ++i) {
         drawVerticalLine(boardStart.x + squareLength * i, boardStart.y, squareLength * BOARD_SIZE);
         drawHorizontalLine(boardStart.x, boardStart.y + squareLength * i, squareLength * BOARD_SIZE);
+    }
+}
+
+void Application::drawHand() {
+    SDL_Point start(width - 10 - squareLength, 10);
+    char text[2] = "";
+
+    SDL_Rect rect(start.x, start.y, squareLength, squareLength);
+    rect.w = rect.h = squareLength;
+
+    for(int i = 0 ; i < player.capacity ; ++i) {
+        setColor(238, 195, 166);
+        drawSquare(rect.x, rect.y, squareLength);
+
+        text[0] = player.hand[i];
+        drawCenteredText(rect, text, 103, 88, 78);
+
+        rect.y += 5 + squareLength;
     }
 }

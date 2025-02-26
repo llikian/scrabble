@@ -8,9 +8,11 @@
 #include <iostream>
 #include <random>
 
-Bag::Bag() : letters(nullptr), size(0) {
+Bag::Bag()
+    : letters(nullptr), size(0) {
+
     unsigned int totalLetters = 0;
-    for(unsigned int letterCount: letterCounts) {
+    for(unsigned int letterCount : letterCounts) {
         totalLetters += letterCount;
     }
 
@@ -48,12 +50,14 @@ char Bag::drawLetter() {
     return letters[--size];
 }
 
-unsigned int Bag::getPoints(char letter) const {
+unsigned int Bag::getPoints(char letter) {
     if(letter >= 'A' && letter <= 'Z') {
         return points[letter - 'A'];
-    } else if(letter >= 'a' && letter <= 'b') {
-        return points[letter - 'a'];
-    } else {
-        return 0;
     }
+
+    if(letter >= 'a' && letter <= 'b') {
+        return points[letter - 'a'];
+    }
+
+    return 0;
 }

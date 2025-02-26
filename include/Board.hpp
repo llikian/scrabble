@@ -5,9 +5,7 @@
 
 #pragma once
 
-#include <stack>
 #include <string>
-#include <vector>
 #include "Bag.hpp"
 #include "Dictionary.hpp"
 #include "Player.hpp"
@@ -21,49 +19,25 @@ enum Direction : bool {
 };
 
 struct Hand {
-    Hand(const Player& player)
-        : capacity(player.capacity) {
-        for(int i = 0 ; i < capacity ; ++i) {
-            letters[i] = player.hand[i];
-        }
-    }
-
-    Hand(const Hand& hand)
-        : capacity(hand.capacity) {
-        for(int i = 0 ; i < capacity ; ++i) {
-            letters[i] = hand.letters[i];
-        }
-    }
-
-    Hand(const Hand& hand, int removedLetterIndex)
-        : capacity(0) {
-        for(int i = 0 ; i < hand.capacity ; ++i) {
-            if(i != removedLetterIndex) {
-                letters[capacity] = hand.letters[i];
-                capacity++;
-            }
-        }
-    }
-
-    void operator=(const Hand& hand) {
-        capacity = hand.capacity;
-
-        for(int i = 0 ; i < capacity ; ++i) {
-            letters[i] = hand.letters[i];
-        }
-    }
+    Hand(const Player& player);
+    Hand(const Hand& hand);
+    Hand(const Hand& hand, int removedLetterIndex);
+    void operator=(const Hand& hand);
 
     char letters[7];
     int capacity;
 };
 
 struct State {
-    State(const Position& position, Node* node, const Hand& hand) : position(position), node(node), hand(hand) { }
+    State(const Position& position, Node* node, const std::string& word, const Hand& hand);
+
+    State(const Position& position, Node* node, const std::string& word, const Hand& hand, bool foundPlus);
 
     Position position;
     Node* node;
     std::string word; // Word as it is in the gaddag
     Hand hand;
+    bool foundPlus;
 };
 
 struct Move {

@@ -11,7 +11,11 @@
 #include <iostream>
 #include "Board.hpp"
 
-Node::Node(const char value, const bool isTerminal) : value(value), isTerminal(isTerminal), children{} { }
+Node::Node(const char value, const bool isTerminal) : value(value), isTerminal(isTerminal) {
+    for(Node*& child : children) {
+        child = nullptr;
+    }
+}
 
 Node*& Node::operator[](char letter) {
     if(letter >= 'A' && letter <= 'Z') {
@@ -37,7 +41,8 @@ Node::~Node() {
 
 Dictionary::Dictionary() : root(new Node('\0', false)) { }
 
-Dictionary::Dictionary(const std::string& loadPath) : root(new Node('\0', false)) {
+Dictionary::Dictionary(const std::string& loadPath)
+    : root(new Node('\0', false)) {
     std::ifstream file(loadPath);
     if(!file.is_open()) {
         throw std::runtime_error("Couldn't open file \"" + loadPath + "\".");
@@ -58,7 +63,7 @@ Dictionary::~Dictionary() {
 void Dictionary::insertWord(const std::string& word) {
     Node* current = root;
 
-    for(char l: word) {
+    for(char l : word) {
         if(l >= 'a' && l <= 'z') {
             l += 'A' - 'a';
         }
@@ -88,7 +93,7 @@ void Dictionary::insertGADDAGWord(const std::string& word) {
 bool Dictionary::containWord(const std::string& word) const {
     Node* current = root;
 
-    for(char l: word) {
+    for(char l : word) {
         Node* child = current->getChild(l);
 
         if(child == nullptr) {
