@@ -45,7 +45,7 @@ Application::Application()
     handleResize();
 
     board.loadFromFile("data/boards/board1.txt");
-    board.findBestMove(player);
+    board.findAllMoves(player);
 }
 
 Application::~Application() {
@@ -165,7 +165,7 @@ void Application::handleInputs(SDL_Scancode scancode) {
             break;
         case SDL_SCANCODE_SPACE:
             if(!keysFlags[scancode]) {
-                board.findBestMove(player);
+                board.findAllMoves(player);
                 keysFlags.at(scancode) = true;
             }
             break;
@@ -252,7 +252,7 @@ void Application::drawHand() {
     SDL_Rect rect(start.x, start.y, squareLength, squareLength);
     rect.w = rect.h = squareLength;
 
-    for(int i = 0 ; i < player.capacity ; ++i) {
+    for(unsigned int i = 0 ; i < player.capacity ; ++i) {
         setColor(238, 195, 166);
         drawSquare(rect.x, rect.y, squareLength);
 
