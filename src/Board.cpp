@@ -152,6 +152,38 @@ BonusType Board::getBonusType(int row, int column) const {
     return board[row][column].type;
 }
 
+void Board::applyBonusPoints(Move& move) const //TODO Take Scrabble bonus in account
+{
+    int wordMultiplier = 1;
+
+    for (int i = 0; i < static_cast<int>(move.word.length()); ++i)
+    {
+        // Switch on type ow each spot in the direction of the word
+        switch (board[move.start.x + move.direction * i][move.start.y + !move.direction * i].type)
+        {
+            case BonusType::None:
+                move.points += Bag::getPoints(move.word[i]);
+                break;
+            case BonusType::LetterX2:
+                move.points += (Bag::getPoints(move.word[i]) * 2);
+                break;
+            case BonusType::LetterX3:
+                move.points += (Bag::getPoints(move.word[i]) * 3);
+                break;
+            case BonusType::WordX2:
+                move.points += Bag::getPoints(move.word[i]);
+                wordMultiplier *= 2;
+                break;
+            case BonusType::WordX3:
+                move.points += Bag::getPoints(move.word[i]);
+                wordMultiplier *= 3;
+                break;
+        }
+    }
+
+    move.points *= wordMultiplier;
+}
+
 void Board::checkForWords(Player& player, const Spot* startSpot, std::vector<Move>& moves, const Direction& direction)
 {
     std::stack<State> stack;
@@ -167,13 +199,15 @@ void Board::checkForWords(Player& player, const Spot* startSpot, std::vector<Mov
         if(spot.character == '\0') { // Spot is empty
             // We found a correct word
             if(top.node->isTerminal) {
-                moves.emplace_back(startSpot->position, direction, top.word);
+                Move move(startSpot->position, direction, top.word, 0);
+                applyBonusPoints(move);
+                moves.emplace_back(move);
             }
 
             // There is a path labeled with a '+' in the GADDAG
             if(Node* node = top.node->getChild('+') ; node != nullptr) {
                 // Add 1 to current direction
-                Position pos(startSpot->position.x + direction, startSpot->position.y + !direction); //OK
+                Position pos(startSpot->position.x + direction, startSpot->position.y + !direction);
                 stack.emplace(pos, node, top.word + '+', top.hand, true);
             }
 
@@ -182,9 +216,9 @@ void Board::checkForWords(Player& player, const Spot* startSpot, std::vector<Mov
                 if(Node* node = top.node->getChild(top.hand.letters[i]) ; node != nullptr) {
                     Position position = direction
                         ? Position(top.position.x + (top.foundPlus ? 1 : -1), top.position.y)
-                        : Position(top.position.x, top.position.y + top.foundPlus ? 1 : -1); //OK
+                        : Position(top.position.x, top.position.y + top.foundPlus ? 1 : -1);
 
-                    if(direction ? top.position.x : top.position.y < BOARD_SIZE) { //OK
+                    if(direction ? top.position.x : top.position.y < BOARD_SIZE) {
                         stack.emplace(position, node, top.word + top.hand.letters[i], Hand(top.hand, i));
                     }
                 }
@@ -193,17 +227,17 @@ void Board::checkForWords(Player& player, const Spot* startSpot, std::vector<Mov
             // There is a path labeled with the letter on the spot in the GADDAG
             Position position = direction
                 ? Position(top.position.x + (top.foundPlus ? 1 : -1), top.position.y)
-                : Position(top.position.x, top.position.y + (top.foundPlus ? 1 : -1)); //OK
+                : Position(top.position.x, top.position.y + (top.foundPlus ? 1 : -1));
 
 
-            if(direction ? top.position.x : top.position.y < BOARD_SIZE) { //OK
+            if(direction ? top.position.x : top.position.y < BOARD_SIZE) {
                 stack.emplace(position, node, top.word + spot.character, top.hand);
             }
         }
     }
 }
 
-void Board::findBestMove(Player& player) {
+void Board::findAllMoves(Player& player) {
     /* ---- Find possible start positions ---- */
     std::unordered_set<const Spot*> startPositions;
 
@@ -224,18 +258,19 @@ void Board::findBestMove(Player& player) {
             startPositions.emplace(&board[8][8]);
         } else { // The game is over
             std::cout << "No starting positions were found.\n";
+            return;
         }
     }
 
     std::vector<Move> moves;
     for(const Spot* startSpot : startPositions) {
         checkForWords(player, startSpot, moves, HORIZONTAL);
-        checkForWords(player, startSpot, moves, VERTICAL); //TODO Faire marcher ça
+        checkForWords(player, startSpot, moves, VERTICAL);
     }
 
-    for(const auto& [start, direction, word] : moves) {
+    for(const auto& [start, direction, word, points] : moves) {
         std::cout << (direction ? "[V] " : "[H] ");
         std::cout << '(' << start.x << ", " << start.y << ") ";
-        std::cout << word << '\n';
+        std::cout << word << " : " << points << " points" << '\n';
     }
 }

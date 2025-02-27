@@ -46,6 +46,7 @@ struct Move {
     Position start; // Position where the search started
     Direction direction;
     std::string word; // Word as it is in the gaddag
+    unsigned int points;
 };
 
 /**
@@ -61,9 +62,10 @@ public:
 
     char& operator ()(int row, int column);
     BonusType getBonusType(int row, int column) const;
+    void applyBonusPoints(Move& move) const;
 
-    void findBestMove(Player& player);
     void checkForWords(Player& player, const Spot* startSpot, std::vector<Move>& moves, const Direction& direction);
+    void findAllMoves(Player& player);
 
 private:
     Spot board[BOARD_SIZE][BOARD_SIZE];
