@@ -5,6 +5,7 @@
 
 #include "Board.hpp"
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <stack>
@@ -51,6 +52,11 @@ State::State(const Position& position, Node* node, const std::string& word, cons
 
 State::State(const Position& position, Node* node, const std::string& word, const Hand& hand, bool foundPlus)
     : position(position), node(node), word(word), hand(hand), foundPlus(foundPlus) { }
+
+bool Move::compareByPoints(const Move& m1, const Move& m2)
+{
+    return m1.points > m2.points;
+}
 
 Board::Board(const Bag& bag, const Dictionary& dictionary)
     : bag(bag), dictionay(dictionary) {
@@ -260,7 +266,7 @@ void Board::applyBonusPoints(Move& move) const //TODO Take Scrabble bonus in acc
     move.points *= wordMultiplier;
 }
 
-void Board::checkForWords(Player& player, const Spot* startSpot, std::vector<Move>& moves, const Direction& direction)
+void Board::checkForWords(Player& player, const Spot* startSpot, std::vector<Move>& moves, const Direction& direction) const
 {
     std::stack<State> stack;
 
@@ -277,7 +283,8 @@ void Board::checkForWords(Player& player, const Spot* startSpot, std::vector<Mov
             if(top.node->isTerminal) {
                 Move move(startSpot->position, direction, top.word, 0);
                 applyBonusPoints(move);
-                if (move.points > 0) // If th move is valid
+
+                if (move.points > 0) // If the move is valid
                     moves.emplace_back(move);
             }
 
@@ -314,9 +321,15 @@ void Board::checkForWords(Player& player, const Spot* startSpot, std::vector<Mov
     }
 }
 
-void Board::findAllMoves(Player& player) {
+void Board::sortMoveByPoints(std::vector<Move>& moves) const
+{
+    std::sort(moves.begin(), moves.end(), Move::compareByPoints);
+}
+
+std::vector<Move> Board::getAllMoves(Player& player) const {
     /* ---- Find possible start positions ---- */
     std::unordered_set<const Spot*> startPositions;
+    std::vector<Move> moves;
 
     for(int i = 0 ; i < BOARD_SIZE ; ++i) {
         for(int j = 0 ; j < BOARD_SIZE ; ++j) {
@@ -335,20 +348,24 @@ void Board::findAllMoves(Player& player) {
             startPositions.emplace(&board[8][8]);
         } else { // The game is over
             std::cout << "No starting positions were found.\n";
-            return;
+            return moves; //Empty vector
         }
     }
 
-    std::vector<Move> moves;
     for(const Spot* startSpot : startPositions) {
         checkForWords(player, startSpot, moves, HORIZONTAL);
         checkForWords(player, startSpot, moves, VERTICAL);
     }
 
+    sortMoveByPoints(moves);
 
     for(const auto& [start, direction, word, points] : moves) {
         std::cout << (direction ? "[V] " : "[H] ");
         std::cout << '(' << start.x << ", " << start.y << ") ";
         std::cout << word << " : " << points << " points" << '\n';
     }
+
+    return moves;
 }
+
+

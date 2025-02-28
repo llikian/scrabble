@@ -45,7 +45,7 @@ Application::Application()
     handleResize();
 
     board.loadFromFile("data/boards/board1.txt");
-    board.findAllMoves(player);
+    board.getAllMoves(player);
 }
 
 Application::~Application() {
@@ -165,7 +165,7 @@ void Application::handleInputs(SDL_Scancode scancode) {
             break;
         case SDL_SCANCODE_SPACE:
             if(!keysFlags[scancode]) {
-                board.findAllMoves(player);
+                board.getAllMoves(player);
                 keysFlags.at(scancode) = true;
             }
             break;

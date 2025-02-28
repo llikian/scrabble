@@ -47,6 +47,8 @@ struct Move {
     Direction direction;
     std::string word; // Word as it is in the gaddag
     unsigned int points;
+
+    static bool compareByPoints(const Move& m1, const Move& m2);
 };
 
 /**
@@ -63,16 +65,15 @@ public:
     char& operator ()(int row, int column);
     BonusType getBonusType(int row, int column) const;
 
-    int getWordPoints(const Spot& startSpot, const Direction& direction) const;
-    void applyBonusPoints(Move& move) const;
-
-    void checkForWords(Player& player, const Spot* startSpot, std::vector<Move>& moves, const Direction& direction);
-
-
-    void findAllMoves(Player& player);
+    void sortMoveByPoints(std::vector<Move>& moves) const;
+    std::vector<Move> getAllMoves(Player& player) const;
 
 private:
     Spot board[BOARD_SIZE][BOARD_SIZE];
     const Bag& bag;
     const Dictionary& dictionay;
+
+    int getWordPoints(const Spot& startSpot, const Direction& direction) const;
+    void applyBonusPoints(Move& move) const;
+    void checkForWords(Player& player, const Spot* startSpot, std::vector<Move>& moves, const Direction& direction) const;
 };
