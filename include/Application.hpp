@@ -48,10 +48,13 @@ private:
 
     void drawBoard();
     void drawHand();
+    void drawIndices();
 
     SDL_Window* window;
     SDL_Renderer* renderer;
+
     TTF_Font* font;
+    float fontSize;
 
     int width, height;
 

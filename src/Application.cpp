@@ -10,6 +10,7 @@
 
 Application::Application()
     : window(nullptr), renderer(nullptr), font(nullptr),
+      fontSize(20),
       width(1440), height(810),
       stop(false),
       dictionary("data/dico.txt"),
@@ -36,7 +37,7 @@ Application::Application()
         throw std::runtime_error(std::string("Couldn't create renderer: ") + SDL_GetError());
     }
 
-    font = TTF_OpenFont("data/fonts/courbd.ttf", 20);
+    font = TTF_OpenFont("data/fonts/courbd.ttf", fontSize);
     if(font == nullptr) {
         throw std::runtime_error(std::string("Couldn't open font: ") + SDL_GetError());
     }
@@ -65,6 +66,7 @@ void Application::run() {
 
         drawBoard();
         drawHand();
+        drawIndices();
         drawText(5, 5, score + std::to_string(player.points), 238, 195, 166);
 
         SDL_RenderPresent(renderer);
@@ -176,17 +178,13 @@ void Application::handleInputs(SDL_Scancode scancode) {
 
 void Application::handleResize() {
     SDL_GetWindowSize(window, &width, &height);
-    TTF_SetFontSize(font, 0.8f * (std::min(width, height) - 20) / 15);
 
-    if(width < height) {
-        squareLength = (width - 20) / BOARD_SIZE;
-        boardStart.x = 10;
-        boardStart.y = (height - width) / 2;
-    } else {
-        squareLength = (height - 20) / BOARD_SIZE;
-        boardStart.x = (width - height) / 2;
-        boardStart.y = 10;
-    }
+    fontSize = 0.8f * (std::min(width, height) - 20) / 15;
+    TTF_SetFontSize(font, fontSize);
+
+    squareLength = (height - 100) / BOARD_SIZE;
+    boardStart.x = (width - height) / 2;
+    boardStart.y = 50;
 }
 
 void Application::drawBoard() {
@@ -246,10 +244,8 @@ void Application::drawBoard() {
 }
 
 void Application::drawHand() {
-    SDL_Point start(width - 10 - squareLength, 10);
     char text[2] = "";
-
-    SDL_Rect rect(start.x, start.y, squareLength, squareLength);
+    SDL_Rect rect(width - 10 - squareLength, 10, squareLength, squareLength);
     rect.w = rect.h = squareLength;
 
     for(int i = 0 ; i < player.capacity ; ++i) {
@@ -261,4 +257,27 @@ void Application::drawHand() {
 
         rect.y += 5 + squareLength;
     }
+}
+
+void Application::drawIndices() {
+    TTF_SetFontSize(font, 6 * fontSize / 10);
+
+    SDL_Rect top(boardStart.x, boardStart.y - squareLength, squareLength, squareLength);
+    SDL_Rect bottom(boardStart.x, boardStart.y + squareLength * BOARD_SIZE, squareLength, squareLength);
+    SDL_Rect left(boardStart.x - squareLength, boardStart.y, squareLength, squareLength);
+    SDL_Rect right(boardStart.x + squareLength * BOARD_SIZE, boardStart.y, squareLength, squareLength);
+
+    for(int i = 0 ; i < BOARD_SIZE ; ++i) {
+        drawCenteredText(top, std::to_string(i), 238, 195, 166);
+        drawCenteredText(bottom, std::to_string(i), 238, 195, 166);
+        drawCenteredText(left, std::to_string(i), 238, 195, 166);
+        drawCenteredText(right, std::to_string(i), 238, 195, 166);
+
+        top.x += squareLength;
+        bottom.x += squareLength;
+        left.y += squareLength;
+        right.y += squareLength;
+    }
+
+    TTF_SetFontSize(font, fontSize);
 }
