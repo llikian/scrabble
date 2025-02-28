@@ -196,15 +196,15 @@ int Board::getWordPoints(const Spot& startSpot, const Direction& direction) cons
 void Board::applyBonusPoints(Move& move) const //TODO Take Scrabble bonus in account
 {
     int wordMultiplier = 1;
-    Position spotPos(move.start.x, move.start.y);
+    Position spotPos(move.start.x - move.direction, move.start.y - move.direction);
     bool backward = true;
 
     for (int i = 0; i < static_cast<int>(move.word.length()); ++i)
     {
         if (move.word[i] == '+') // End of backward path
         {
-            spotPos.x = move.start.x + move.direction;
-            spotPos.y = move.start.y + !move.direction;
+            spotPos.x = move.start.x ;
+            spotPos.y = move.start.y;
             backward = false;
             continue;
         }
@@ -266,6 +266,11 @@ void Board::applyBonusPoints(Move& move) const //TODO Take Scrabble bonus in acc
     move.points *= wordMultiplier;
 }
 
+void Board::sortMoveByPoints(std::vector<Move>& moves) const
+{
+    std::sort(moves.begin(), moves.end(), Move::compareByPoints);
+}
+
 void Board::checkForWords(Player& player, const Spot* startSpot, std::vector<Move>& moves, const Direction& direction) const
 {
     std::stack<State> stack;
@@ -319,11 +324,6 @@ void Board::checkForWords(Player& player, const Spot* startSpot, std::vector<Mov
             }
         }
     }
-}
-
-void Board::sortMoveByPoints(std::vector<Move>& moves) const
-{
-    std::sort(moves.begin(), moves.end(), Move::compareByPoints);
 }
 
 std::vector<Move> Board::getAllMoves(Player& player) const {
