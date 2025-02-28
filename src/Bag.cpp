@@ -61,3 +61,11 @@ unsigned int Bag::getPoints(char letter) {
 
     return 0;
 }
+
+unsigned int Bag::getWordPoints(const std::string& word)
+{
+    unsigned int points = 0;
+    for (char c : word)
+        points += getPoints(c);
+    return points;
+}

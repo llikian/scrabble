@@ -6,6 +6,8 @@
 #pragma once
 
 #include <string>
+#include <vector>
+
 #include "Bag.hpp"
 #include "Dictionary.hpp"
 #include "Player.hpp"
@@ -14,8 +16,8 @@
 #define BOARD_SIZE 15
 
 enum Direction : bool {
-    VERTICAL,
-    HORIZONTAL
+    VERTICAL, //0
+    HORIZONTAL //1
 };
 
 struct Hand {
@@ -44,6 +46,9 @@ struct Move {
     Position start; // Position where the search started
     Direction direction;
     std::string word; // Word as it is in the gaddag
+    unsigned int points;
+
+    static bool compareByPoints(const Move& m1, const Move& m2);
 };
 
 /**
@@ -60,10 +65,15 @@ public:
     char& operator ()(int row, int column);
     BonusType getBonusType(int row, int column) const;
 
-    void findBestMove(Player& player);
+    void sortMoveByPoints(std::vector<Move>& moves) const;
+    std::vector<Move> getAllMoves(Player& player) const;
 
 private:
     Spot board[BOARD_SIZE][BOARD_SIZE];
     const Bag& bag;
     const Dictionary& dictionay;
+
+    int getWordPoints(const Spot& startSpot, const Direction& direction) const;
+    void applyBonusPoints(Move& move) const;
+    void checkForWords(Player& player, const Spot* startSpot, std::vector<Move>& moves, const Direction& direction) const;
 };
