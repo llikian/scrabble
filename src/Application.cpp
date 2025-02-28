@@ -260,7 +260,7 @@ void Application::drawHand() {
 }
 
 void Application::drawIndices() {
-    TTF_SetFontSize(font, 6 * fontSize / 10);
+    TTF_SetFontSize(font, 3 * fontSize / 5);
 
     SDL_Rect top(boardStart.x, boardStart.y - squareLength, squareLength, squareLength);
     SDL_Rect bottom(boardStart.x, boardStart.y + squareLength * BOARD_SIZE, squareLength, squareLength);
