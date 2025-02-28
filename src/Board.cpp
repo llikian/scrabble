@@ -163,7 +163,6 @@ int Board::getWordPoints(const Spot& startSpot, const Direction& direction) cons
     std::string word;
     Position spotPos(startSpot.position.x, startSpot.position.y);
 
-    //TODO : Iterate in +- direction while there is char on th board
     while (spotPos.x < BOARD_SIZE && spotPos.y < BOARD_SIZE && board[spotPos.x][spotPos.y].character != '\0')
     {
         word += board[spotPos.x][spotPos.y].character;
@@ -193,7 +192,7 @@ int Board::getWordPoints(const Spot& startSpot, const Direction& direction) cons
     return -1;
 }
 
-void Board::applyBonusPoints(Move& move) const //TODO Take Scrabble bonus in account
+void Board::applyBonusPoints(Move& move) const
 {
     int letterUsed = 0;
     int wordMultiplier = 1;
@@ -211,9 +210,6 @@ void Board::applyBonusPoints(Move& move) const //TODO Take Scrabble bonus in acc
         }
 
         Spot currentSpot = board[spotPos.x][spotPos.y];
-
-
-
         if (currentSpot.character != '\0')
         {
             //If it's not a new character from this move, don't apply bonus
@@ -252,7 +248,6 @@ void Board::applyBonusPoints(Move& move) const //TODO Take Scrabble bonus in acc
             move.points = 0;
             return;
         }
-
         move.points += adjacentWordPoints;
 
         // Move on board in wanted direction
@@ -273,10 +268,7 @@ void Board::applyBonusPoints(Move& move) const //TODO Take Scrabble bonus in acc
 
     // Scrabble !
     if (letterUsed >= 7)
-    {
-        std::cout << "SCRABBLE FOR "<< move.word << std::endl;
         move.points += 50;
-    }
 }
 
 void Board::sortMoveByPoints(std::vector<Move>& moves) const
