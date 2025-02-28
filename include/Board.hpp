@@ -62,9 +62,13 @@ public:
 
     char& operator ()(int row, int column);
     BonusType getBonusType(int row, int column) const;
+
+    int getWordPoints(const Spot& startSpot, const Direction& direction) const;
     void applyBonusPoints(Move& move) const;
 
     void checkForWords(Player& player, const Spot* startSpot, std::vector<Move>& moves, const Direction& direction);
+
+
     void findAllMoves(Player& player);
 
 private:

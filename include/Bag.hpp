@@ -6,6 +6,7 @@
 #pragma once
 
 #define ALPHABET_SIZE 26
+#include <string>
 
 /**
  * @struct Bag
@@ -19,6 +20,7 @@ public:
     char drawLetter();
 
     static unsigned int getPoints(char letter);
+    static unsigned int getWordPoints(const std::string& word);
 
 private:
     char* letters;

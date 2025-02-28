@@ -16,6 +16,8 @@ enum class BonusType : unsigned char {
 struct Position {
     unsigned int x;
     unsigned int y;
+
+    bool operator==(const Position& pos) const;
 };
 
 struct Spot {

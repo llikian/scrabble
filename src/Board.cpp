@@ -152,14 +152,68 @@ BonusType Board::getBonusType(int row, int column) const {
     return board[row][column].type;
 }
 
+int Board::getWordPoints(const Spot& startSpot, const Direction& direction) const
+{
+    std::string word;
+    Position spotPos(startSpot.position.x, startSpot.position.y);
+
+    //TODO : Iterate in +- direction while there is char on th board
+    while (spotPos.x < BOARD_SIZE && spotPos.y < BOARD_SIZE && board[spotPos.x][spotPos.y].character != '\0')
+    {
+        word += board[spotPos.x][spotPos.y].character;
+        spotPos.x -= direction;
+        spotPos.y -= !direction;
+    }
+
+    word += '+';
+    spotPos.x = startSpot.position.x + direction;
+    spotPos.y = startSpot.position.y + !direction;
+
+    while (spotPos.x < BOARD_SIZE && spotPos.y < BOARD_SIZE && board[spotPos.x][spotPos.y].character != '\0')
+    {
+        word += board[spotPos.x][spotPos.y].character;
+        spotPos.x += direction;
+        spotPos.y += !direction;
+    }
+
+    // The letter don't create new words
+    if (word.length() <= 1)
+        return 0;
+
+    if (dictionay.containWord(word))
+        return Bag::getWordPoints(word);
+
+    // The letter create invalid words
+    return -1;
+}
+
 void Board::applyBonusPoints(Move& move) const //TODO Take Scrabble bonus in account
 {
     int wordMultiplier = 1;
+    Position spotPos(move.start.x, move.start.y);
+    bool backward = true;
 
     for (int i = 0; i < static_cast<int>(move.word.length()); ++i)
     {
-        // Switch on type ow each spot in the direction of the word
-        switch (board[move.start.x + move.direction * i][move.start.y + !move.direction * i].type)
+        if (move.word[i] == '+') // End of backward path
+        {
+            spotPos.x = move.start.x + move.direction;
+            spotPos.y = move.start.y + !move.direction;
+            backward = false;
+            continue;
+        }
+
+        Spot currentSpot = board[spotPos.x][spotPos.y];
+
+        //Don't apply bonuses for starting letter except for starting word
+        if (currentSpot.position.x != BOARD_SIZE/2 && currentSpot.position.y != BOARD_SIZE/2
+            && currentSpot.position == move.start) {
+            move.points += Bag::getPoints(move.word[i]);
+            continue;
+        }
+
+        // Switch on type of each spot in the direction of the word
+        switch (currentSpot.type)
         {
             case BonusType::None:
                 move.points += Bag::getPoints(move.word[i]);
@@ -179,8 +233,30 @@ void Board::applyBonusPoints(Move& move) const //TODO Take Scrabble bonus in acc
                 wordMultiplier *= 3;
                 break;
         }
-    }
 
+        // Check for crossing words
+        int adjacentWordPoints = getWordPoints(currentSpot, static_cast<Direction>(!move.direction)); // Perpendicular direction
+        if (adjacentWordPoints == -1) { //Crossing invalid words, move is invalid
+            move.points = 0;
+            return;
+        }
+
+        move.points += adjacentWordPoints;
+
+        // Move on board in wanted direction
+        if (backward) {
+            if(spotPos.x > 0)
+                spotPos.x -= move.direction;
+            if(spotPos.y > 0)
+                spotPos.y -= !move.direction;
+        }
+        else {
+            if(spotPos.x < BOARD_SIZE)
+                spotPos.x += move.direction;
+            if(spotPos.y < BOARD_SIZE)
+                spotPos.y += !move.direction;
+        }
+    }
     move.points *= wordMultiplier;
 }
 
@@ -201,7 +277,8 @@ void Board::checkForWords(Player& player, const Spot* startSpot, std::vector<Mov
             if(top.node->isTerminal) {
                 Move move(startSpot->position, direction, top.word, 0);
                 applyBonusPoints(move);
-                moves.emplace_back(move);
+                if (move.points > 0) // If th move is valid
+                    moves.emplace_back(move);
             }
 
             // There is a path labeled with a '+' in the GADDAG
@@ -267,6 +344,7 @@ void Board::findAllMoves(Player& player) {
         checkForWords(player, startSpot, moves, HORIZONTAL);
         checkForWords(player, startSpot, moves, VERTICAL);
     }
+
 
     for(const auto& [start, direction, word, points] : moves) {
         std::cout << (direction ? "[V] " : "[H] ");
