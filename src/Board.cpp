@@ -281,7 +281,7 @@ void Board::checkForWords(Player& player, const Spot* startSpot, std::vector<Mov
         if(spot.character == '\0') { // Spot is empty
             // We found a correct word
             if(top.node->isTerminal) {
-                Move move(startSpot->position, direction, top.word, 0);
+                Move move(startSpot->position, direction, top.word, 0); //TODO Check start position
                 applyBonusPoints(move);
 
                 if (move.points > 0) // If the move is valid
@@ -331,6 +331,7 @@ std::vector<Move> Board::getAllMoves(Player& player) const {
     std::unordered_set<const Spot*> startPositions;
     std::vector<Move> moves;
 
+    //TODO CHECK THIS OUT
     for(int i = 0 ; i < BOARD_SIZE ; ++i) {
         for(int j = 0 ; j < BOARD_SIZE ; ++j) {
             if(board[i][j].character != '\0') { // The spot has a letter on it
