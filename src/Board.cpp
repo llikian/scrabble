@@ -195,32 +195,35 @@ int Board::getWordPoints(const Spot& startSpot, const Direction& direction) cons
 
 void Board::applyBonusPoints(Move& move) const //TODO Take Scrabble bonus in account
 {
+    int letterUsed = 0;
     int wordMultiplier = 1;
-    Position spotPos(move.start.x - move.direction, move.start.y - move.direction);
+    Position spotPos(move.start.x, move.start.y);
     bool backward = true;
 
     for (int i = 0; i < static_cast<int>(move.word.length()); ++i)
     {
         if (move.word[i] == '+') // End of backward path
         {
-            spotPos.x = move.start.x ;
-            spotPos.y = move.start.y;
+            spotPos.x = move.start.x  - move.direction;
+            spotPos.y = move.start.y  - move.direction;
             backward = false;
             continue;
         }
 
         Spot currentSpot = board[spotPos.x][spotPos.y];
 
-        //Don't apply bonuses for starting letter except for starting word
-        if (currentSpot.position.x != BOARD_SIZE/2 && currentSpot.position.y != BOARD_SIZE/2
-            && currentSpot.position == move.start) {
-            move.points += Bag::getPoints(move.word[i]);
-            continue;
-        }
 
-        // Switch on type of each spot in the direction of the word
-        switch (currentSpot.type)
+
+        if (currentSpot.character != '\0')
         {
+            //If it's not a new character from this move, don't apply bonus
+            move.points += Bag::getPoints(move.word[i]);
+        }
+        else
+        {
+            // Apply bonus of the spot
+            switch (currentSpot.type)
+            {
             case BonusType::None:
                 move.points += Bag::getPoints(move.word[i]);
                 break;
@@ -238,6 +241,9 @@ void Board::applyBonusPoints(Move& move) const //TODO Take Scrabble bonus in acc
                 move.points += Bag::getPoints(move.word[i]);
                 wordMultiplier *= 3;
                 break;
+            }
+
+            letterUsed++;
         }
 
         // Check for crossing words
@@ -257,13 +263,20 @@ void Board::applyBonusPoints(Move& move) const //TODO Take Scrabble bonus in acc
                 spotPos.y -= !move.direction;
         }
         else {
-            if(spotPos.x < BOARD_SIZE)
+            if(spotPos.x < BOARD_SIZE - 1)
                 spotPos.x += move.direction;
-            if(spotPos.y < BOARD_SIZE)
+            if(spotPos.y < BOARD_SIZE - 1)
                 spotPos.y += !move.direction;
         }
     }
     move.points *= wordMultiplier;
+
+    // Scrabble !
+    if (letterUsed >= 7)
+    {
+        std::cout << "SCRABBLE FOR "<< move.word << std::endl;
+        move.points += 50;
+    }
 }
 
 void Board::sortMoveByPoints(std::vector<Move>& moves) const
@@ -286,7 +299,7 @@ void Board::checkForWords(Player& player, const Spot* startSpot, std::vector<Mov
         if(spot.character == '\0') { // Spot is empty
             // We found a correct word
             if(top.node->isTerminal) {
-                Move move(startSpot->position, direction, top.word, 0); //TODO Check start position
+                Move move(startSpot->position, direction, top.word, 0);
                 applyBonusPoints(move);
 
                 if (move.points > 0) // If the move is valid
