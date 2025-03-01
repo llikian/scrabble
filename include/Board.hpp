@@ -67,6 +67,10 @@ public:
 
     void sortMoveByPoints(std::vector<Move>& moves) const;
     std::vector<Move> getAllMoves(Player& player) const;
+    Move getMostPointsMove(Player& player) const;
+
+    void playMove(Player& player, const Move& move);
+    void playMostPointsMove(Player& player);
 
 private:
     Spot board[BOARD_SIZE][BOARD_SIZE];

@@ -335,7 +335,6 @@ std::vector<Move> Board::getAllMoves(Player& player) const {
     std::unordered_set<const Spot*> startPositions;
     std::vector<Move> moves;
 
-    //TODO CHECK THIS OUT
     for(int i = 0 ; i < BOARD_SIZE ; ++i) {
         for(int j = 0 ; j < BOARD_SIZE ; ++j) {
             if(board[i][j].character != '\0') { // The spot has a letter on it
@@ -373,4 +372,77 @@ std::vector<Move> Board::getAllMoves(Player& player) const {
     return moves;
 }
 
+Move Board::getMostPointsMove(Player& player) const
+{
+    return getAllMoves(player)[0];
+}
 
+void Board::playMove(Player& player, const Move& move)
+{
+    std::string usedLetters;
+
+    bool backward = true;
+    Position spotPos(move.start.x, move.start.y);
+
+    //Place move word on board
+    for (int i = 0; i < static_cast<int>(move.word.length()); ++i)
+    {
+        if (move.word[i] == '+') // End of backward path
+        {
+            spotPos.x = move.start.x  - move.direction;
+            spotPos.y = move.start.y  - move.direction;
+            backward = false;
+            continue;
+        }
+        if(spotPos.x >= BOARD_SIZE || spotPos.y >= BOARD_SIZE)
+            continue;
+
+        Spot* currentSpot = &board[spotPos.x][spotPos.y];
+
+        if (currentSpot->character == '\0')
+        {
+            usedLetters += move.word[i];
+            currentSpot->character = move.word[i];
+        }
+        else if (currentSpot->character != move.word[i]) //Placing another letter on taken spot
+        {
+            throw std::runtime_error("Placing invalid letter " + move.word[i]);
+        }
+
+        // Move on board in wanted direction
+        if (backward) {
+            spotPos.x -= move.direction;
+            spotPos.y -= !move.direction;
+        }
+        else {
+            spotPos.x += move.direction;
+            spotPos.y += !move.direction;
+        }
+    }
+
+    //Add move points to player
+    player.points += move.points;
+
+    //Remove used letters from player hand
+    for (auto used_letter : usedLetters) {
+        for (char & c : player.hand) {
+            if(c == used_letter) {
+                c = '\0';
+                break;
+            }
+        }
+    }
+    player.drawHand();
+}
+
+void Board::playMostPointsMove(Player& player)
+{
+    Move bestMove = getMostPointsMove(player);
+
+    std::cout<<"Playing best move : "<<std::endl;
+    std::cout << (bestMove.direction ? "[V] " : "[H] ");
+    std::cout << '(' << bestMove.start.x << ", " << bestMove.start.y << ") ";
+    std::cout << bestMove.word << " : " << bestMove.points << " points" << '\n';
+
+    playMove(player, bestMove);
+}
