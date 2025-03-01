@@ -208,8 +208,18 @@ void Board::applyBonusPoints(Move& move) const
             backward = false;
             continue;
         }
+        if(spotPos.x >= BOARD_SIZE || spotPos.y >= BOARD_SIZE)
+            continue;
 
         Spot currentSpot = board[spotPos.x][spotPos.y];
+
+        // Check for crossing words
+        int adjacentWordPoints = getWordPoints(currentSpot, static_cast<Direction>(!move.direction)); // Perpendicular direction
+        if (adjacentWordPoints == -1) { //Crossing invalid words, move is invalid
+            move.points = 0;
+            return;
+        }
+
         if (currentSpot.character != '\0')
         {
             //If it's not a new character from this move, don't apply bonus
@@ -240,28 +250,17 @@ void Board::applyBonusPoints(Move& move) const
             }
 
             letterUsed++;
+            move.points += adjacentWordPoints; // Only take crossing word point if it is created with a new letter
         }
-
-        // Check for crossing words
-        int adjacentWordPoints = getWordPoints(currentSpot, static_cast<Direction>(!move.direction)); // Perpendicular direction
-        if (adjacentWordPoints == -1) { //Crossing invalid words, move is invalid
-            move.points = 0;
-            return;
-        }
-        move.points += adjacentWordPoints;
 
         // Move on board in wanted direction
         if (backward) {
-            if(spotPos.x > 0)
-                spotPos.x -= move.direction;
-            if(spotPos.y > 0)
-                spotPos.y -= !move.direction;
+            spotPos.x -= move.direction;
+            spotPos.y -= !move.direction;
         }
         else {
-            if(spotPos.x < BOARD_SIZE - 1)
-                spotPos.x += move.direction;
-            if(spotPos.y < BOARD_SIZE - 1)
-                spotPos.y += !move.direction;
+            spotPos.x += move.direction;
+            spotPos.y += !move.direction;
         }
     }
     move.points *= wordMultiplier;
