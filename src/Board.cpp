@@ -404,7 +404,7 @@ void Board::playMove(Player& player, const Move& move)
             currentSpot->character = move.word[i];
 
             usedLetters += move.word[i];
-            std::cout<<"Placed letter "<< currentSpot->character <<
+            std::cout<<"Placed letter "<< board[spotPos.x][spotPos.y].character <<
                 " at " << currentSpot->position.x <<"," << currentSpot->position.y << std::endl;
         }
         else if (currentSpot->character != move.word[i]) //Placing another letter on taken spot
