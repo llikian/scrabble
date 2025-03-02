@@ -111,9 +111,11 @@ void Application::drawText(int x, int y, const std::string& text, Uint8 r, Uint8
 }
 
 void Application::drawCenteredText(const SDL_Rect& reference, const std::string& text, Uint8 r, Uint8 g, Uint8 b) {
+    std::cout<< text.c_str();
     SDL_Surface* surface = TTF_RenderText_Solid(font, text.c_str(), SDL_Color(r, g, b, 255));
     if(surface == nullptr) {
-        throw std::runtime_error(std::string("TTF_RenderText_Solid failed: ") + SDL_GetError());
+        std::cout<<std::endl;
+        throw std::runtime_error(std::string("TTF_RenderText_Solid failed: ") + SDL_GetError() + (" on text ") + text.c_str());
     }
 
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
