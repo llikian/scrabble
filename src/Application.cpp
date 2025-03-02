@@ -250,13 +250,15 @@ void Application::drawHand() {
     rect.w = rect.h = squareLength;
 
     for(unsigned int i = 0 ; i < player.capacity ; ++i) {
-        setColor(238, 195, 166);
-        drawSquare(rect.x, rect.y, squareLength);
+        if(player.hand[i] != '\0') {
+            setColor(238, 195, 166);
+            drawSquare(rect.x, rect.y, squareLength);
 
-        text[0] = player.hand[i];
-        drawCenteredText(rect, text, 103, 88, 78);
+            text[0] = player.hand[i];
+            drawCenteredText(rect, text, 103, 88, 78);
 
-        rect.y += 5 + squareLength;
+            rect.y += 5 + squareLength;
+        }
     }
 }
 

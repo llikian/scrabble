@@ -427,15 +427,17 @@ void Board::playMove(Player& player, const Move& move)
     player.points += move.points;
 
     //Remove used letters from player hand
-    for (auto used_letter : usedLetters) {
+    for (char used_letter : usedLetters) {
         for (char & c : player.hand) {
             if(c == used_letter) {
-                c = '\0';
+                c = player.bag.drawLetter();
+                if(c == 0) {
+                    --player.capacity;
+                }
                 break;
             }
         }
     }
-    player.drawHand();
 }
 
 void Board::playMostPointsMove(Player& player)

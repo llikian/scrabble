@@ -20,6 +20,4 @@ struct Player {
     char hand[HAND_SIZE];
     unsigned int capacity;
     unsigned int points;
-
-    void drawHand();
 };

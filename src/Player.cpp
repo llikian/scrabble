@@ -12,13 +12,3 @@ Player::Player(Bag& bag)
         letter = bag.drawLetter();
     }
 }
-
-void Player::drawHand()
-{
-    for (char & c : hand) {
-        if(c == '\0') {
-            c = bag.drawLetter();
-            break;
-        }
-    }
-}
