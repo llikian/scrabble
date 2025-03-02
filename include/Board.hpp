@@ -66,7 +66,7 @@ public:
     BonusType getBonusType(int row, int column) const;
 
     void sortMoveByPoints(std::vector<Move>& moves) const;
-    std::vector<Move> getAllMoves(Player& player) const;
+    std::vector<Move> getAllMoves(Player& player, bool print = false) const;
     Move getMostPointsMove(Player& player) const;
 
     void playMove(Player& player, const Move& move);

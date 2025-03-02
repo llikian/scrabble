@@ -46,8 +46,8 @@ Application::Application()
     handleResize();
 
     board.loadFromFile("data/boards/board1.txt");
-    board.getAllMoves(player);
-    //board.playMostPointsMove(player); //TODO Faire marcher ça
+    // board.getAllMoves(player);
+    board.playMostPointsMove(player); //TODO Faire marcher ça
 }
 
 Application::~Application() {

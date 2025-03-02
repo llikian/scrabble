@@ -203,8 +203,8 @@ void Board::applyBonusPoints(Move& move) const
     {
         if (move.word[i] == '+') // End of backward path
         {
-            spotPos.x = move.start.x  - move.direction;
-            spotPos.y = move.start.y  - move.direction;
+            spotPos.x = move.start.x  + move.direction;
+            spotPos.y = move.start.y  + !move.direction;
             backward = false;
             continue;
         }
@@ -330,7 +330,7 @@ void Board::checkForWords(Player& player, const Spot* startSpot, std::vector<Mov
     }
 }
 
-std::vector<Move> Board::getAllMoves(Player& player) const {
+std::vector<Move> Board::getAllMoves(Player& player, const bool print) const {
     /* ---- Find possible start positions ---- */
     std::unordered_set<const Spot*> startPositions;
     std::vector<Move> moves;
@@ -363,10 +363,12 @@ std::vector<Move> Board::getAllMoves(Player& player) const {
 
     sortMoveByPoints(moves);
 
-    for(const auto& [start, direction, word, points] : moves) {
-        std::cout << (direction ? "[V] " : "[H] ");
-        std::cout << '(' << start.x << ", " << start.y << ") ";
-        std::cout << word << " : " << points << " points" << '\n';
+    if (print) {
+        for(const auto& [start, direction, word, points] : moves) {
+            std::cout << (direction ? "[V] " : "[H] ");
+            std::cout << '(' << start.x << ", " << start.y << ") ";
+            std::cout << word << " : " << points << " points" << '\n';
+        }
     }
 
     return moves;
@@ -389,8 +391,8 @@ void Board::playMove(Player& player, const Move& move)
     {
         if (move.word[i] == '+') // End of backward path
         {
-            spotPos.x = move.start.x  - move.direction;
-            spotPos.y = move.start.y  - move.direction;
+            spotPos.x = move.start.x  + move.direction;
+            spotPos.y = move.start.y  + !move.direction;
             backward = false;
             continue;
         }
@@ -398,11 +400,12 @@ void Board::playMove(Player& player, const Move& move)
             continue;
 
         Spot* currentSpot = &board[spotPos.x][spotPos.y];
-
-        if (currentSpot->character == '\0')
-        {
-            usedLetters += move.word[i];
+        if (currentSpot->character == '\0') {
             currentSpot->character = move.word[i];
+
+            usedLetters += move.word[i];
+            std::cout<<"Placed letter "<< currentSpot->character <<
+                " at " << currentSpot->position.x <<"," << currentSpot->position.y << std::endl;
         }
         else if (currentSpot->character != move.word[i]) //Placing another letter on taken spot
         {
