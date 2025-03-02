@@ -12,3 +12,18 @@ Player::Player(Bag& bag)
         letter = bag.drawLetter();
     }
 }
+
+void Player::refreshHand(const std::string& usedLetters)
+{
+    for (char used_letter : usedLetters) {
+        for (char & c : hand) {
+            if(c == used_letter) {
+                c = bag.drawLetter();
+                if(c == 0) {
+                    --capacity;
+                }
+                break;
+            }
+        }
+    }
+}
