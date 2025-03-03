@@ -125,7 +125,7 @@ void Dictionary::unitTests() {
         assert(dico.containWord("BA+C"));
         assert(dico.containWord("CBA+"));
 
-        std::cout << "  Manual insertion test passes!\n";
+        std::cout << "  Manual Insertion Test passed !\n";
     }
 
     /* File Insertion Test */ {
@@ -143,7 +143,7 @@ void Dictionary::unitTests() {
         assert(dico.containWord("MUTAZILISMES"));
         assert(!dico.containWord("VHJIDVU"));
 
-        std::cout << "  File insertion test passes!\n";
+        std::cout << "  File Insertion Test passed !\n";
     }
 
     /* Full Dictionary Test */ {
@@ -172,8 +172,8 @@ void Dictionary::unitTests() {
             }
         }
 
-        std::cout << "  Full dictionary test passes!\n";
+        std::cout << "  Full Dictionary Test passed !\n";
     }
 
-    std::cout << "All dictionary tests passed!\n\n";
+    std::cout << "All Dictionary Unit Tests passed !\n\n";
 }
