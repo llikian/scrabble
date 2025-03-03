@@ -19,4 +19,6 @@ struct Hand {
 
     char letters[7];
     unsigned int capacity;
+
+    static void unitTests();
 };
