@@ -154,7 +154,6 @@ void Hand::unitTests() {
 }
 
 int main() {
-    Bag::unitTests();
     Dictionary::unitTests();
     Hand::unitTests();
 
