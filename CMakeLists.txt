@@ -15,9 +15,13 @@ set(SOURCES
         src/Application.cpp
         src/Bag.cpp
         src/Board.cpp
-        src/Player.cpp
-        src/Spot.cpp
         src/Dictionary.cpp
+        src/Hand.cpp
+        src/Move.cpp
+        src/Player.cpp
+        src/Position.cpp
+        src/Spot.cpp
+        src/State.cpp
 )
 
 set(INCLUDES

@@ -11,52 +11,7 @@
 #include <stack>
 #include <stdexcept>
 #include <unordered_set>
-
-Hand::Hand(const Player& player)
-    : capacity(player.capacity) {
-
-    for(int i = 0 ; i < capacity ; ++i) {
-        letters[i] = player.hand[i];
-    }
-}
-
-Hand::Hand(const Hand& hand)
-    : capacity(hand.capacity) {
-
-    for(int i = 0 ; i < capacity ; ++i) {
-        letters[i] = hand.letters[i];
-    }
-}
-
-Hand::Hand(const Hand& hand, int removedLetterIndex)
-    : capacity(0) {
-
-    for(int i = 0 ; i < hand.capacity ; ++i) {
-        if(i != removedLetterIndex) {
-            letters[capacity] = hand.letters[i];
-            capacity++;
-        }
-    }
-}
-
-void Hand::operator=(const Hand& hand) {
-    capacity = hand.capacity;
-
-    for(int i = 0 ; i < capacity ; ++i) {
-        letters[i] = hand.letters[i];
-    }
-}
-
-State::State(const Position& position, Node* node, const std::string& word, const Hand& hand)
-    : position(position), node(node), word(word), hand(hand), foundPlus(false) { }
-
-State::State(const Position& position, Node* node, const std::string& word, const Hand& hand, bool foundPlus)
-    : position(position), node(node), word(word), hand(hand), foundPlus(foundPlus) { }
-
-bool Move::compareByPoints(const Move& m1, const Move& m2)
-{
-    return m1.points > m2.points;
-}
+#include "State.hpp"
 
 Board::Board(const Bag& bag, const Dictionary& dictionary)
     : bag(bag), dictionay(dictionary) {
@@ -148,6 +103,14 @@ void Board::saveToFile(const std::string& path) const {
 
         file << '\n';
     }
+}
+
+bool Board::isPositionValid(const Position& position) const {
+    return position.x > 0 && position.y > 0 && position.x < BOARD_SIZE && position.y < BOARD_SIZE;
+}
+
+bool Board::isCoordinateValid(unsigned int coord) const {
+    return coord > 0 && coord < BOARD_SIZE;
 }
 
 char& Board::operator ()(int row, int column) {
@@ -272,11 +235,10 @@ void Board::applyBonusPoints(Move& move) const
 
 void Board::sortMoveByPoints(std::vector<Move>& moves) const
 {
-    std::sort(moves.begin(), moves.end(), Move::compareByPoints);
+    std::sort(moves.begin(), moves.end(), operator>);
 }
 
-void Board::checkForWords(Player& player, const Spot* startSpot, std::vector<Move>& moves, const Direction& direction) const
-{
+void Board::checkForWords(Player& player, const Spot* startSpot, std::vector<Move>& moves, const Direction& direction) const {
     std::stack<State> stack;
 
     State init(startSpot->position, dictionay.root, "", Hand(player));
@@ -286,6 +248,7 @@ void Board::checkForWords(Player& player, const Spot* startSpot, std::vector<Mov
         stack.pop();
 
         const Spot& spot = board[top.position.x][top.position.y];
+        const unsigned int shift = top.foundPlus ? 1 : -1;
 
         if(spot.character == '\0') { // Spot is empty
             // We found a correct word
@@ -293,25 +256,28 @@ void Board::checkForWords(Player& player, const Spot* startSpot, std::vector<Mov
                 Move move(startSpot->position, direction, top.word, 0);
                 applyBonusPoints(move);
 
-                if (move.points > 0) // If the move is valid
+                if(move.points > 0) { // If the move is valid
                     moves.emplace_back(move);
+                }
             }
 
             // There is a path labeled with a '+' in the GADDAG
             if(Node* node = top.node->getChild('+') ; node != nullptr) {
                 // Add 1 to current direction
-                Position pos(startSpot->position.x + direction, startSpot->position.y + !direction);
-                stack.emplace(pos, node, top.word + '+', top.hand, true);
+                Position position(startSpot->position.x + direction, startSpot->position.y + !direction);
+                if(isCoordinateValid(direction ? position.x : position.y)) {
+                    stack.emplace(position, node, top.word + '+', top.hand, true);
+                }
             }
 
             // Create a new state on the stack for each letter from the hand that could be placed
-            for(int i = 0 ; i < top.hand.capacity ; ++i) {
+            for(unsigned int i = 0 ; i < top.hand.capacity ; ++i) {
                 if(Node* node = top.node->getChild(top.hand.letters[i]) ; node != nullptr) {
                     Position position = direction
-                        ? Position(top.position.x + (top.foundPlus ? 1 : -1), top.position.y)
-                        : Position(top.position.x, top.position.y + top.foundPlus ? 1 : -1);
+                                            ? Position(top.position.x + shift, top.position.y)
+                                            : Position(top.position.x, top.position.y + shift);
 
-                    if(direction ? top.position.x : top.position.y < BOARD_SIZE) {
+                    if(isCoordinateValid(direction ? position.x : position.y)) {
                         stack.emplace(position, node, top.word + top.hand.letters[i], Hand(top.hand, i));
                     }
                 }
@@ -319,11 +285,10 @@ void Board::checkForWords(Player& player, const Spot* startSpot, std::vector<Mov
         } else if(Node* node = top.node->getChild(spot.character) ; node != nullptr) {
             // There is a path labeled with the letter on the spot in the GADDAG
             Position position = direction
-                ? Position(top.position.x + (top.foundPlus ? 1 : -1), top.position.y)
-                : Position(top.position.x, top.position.y + (top.foundPlus ? 1 : -1));
+                                    ? Position(top.position.x + shift, top.position.y)
+                                    : Position(top.position.x, top.position.y + shift);
 
-
-            if(direction ? top.position.x : top.position.y < BOARD_SIZE) {
+            if(isCoordinateValid(direction ? position.x : position.y)) {
                 stack.emplace(position, node, top.word + spot.character, top.hand);
             }
         }
@@ -338,10 +303,10 @@ std::vector<Move> Board::getAllMoves(Player& player, const bool print) const {
     for(int i = 0 ; i < BOARD_SIZE ; ++i) {
         for(int j = 0 ; j < BOARD_SIZE ; ++j) {
             if(board[i][j].character != '\0') { // The spot has a letter on it
-                if(board[i + 1][j].character == '\0') { startPositions.emplace(&board[i + 1][j]); }
-                if(board[i][j + 1].character == '\0') { startPositions.emplace(&board[i][j + 1]); }
-                if(board[i - 1][j].character == '\0') { startPositions.emplace(&board[i - 1][j]); }
-                if(board[i][j - 1].character == '\0') { startPositions.emplace(&board[i][j - 1]); }
+                if(i < BOARD_SIZE - 1 && board[i + 1][j].character == '\0') { startPositions.emplace(&board[i + 1][j]); }
+                if(j < BOARD_SIZE - 1 && board[i][j + 1].character == '\0') { startPositions.emplace(&board[i][j + 1]); }
+                if(i > 0 && board[i - 1][j].character == '\0') { startPositions.emplace(&board[i - 1][j]); }
+                if(j > 0 && board[i][j - 1].character == '\0') { startPositions.emplace(&board[i][j - 1]); }
             }
         }
     }

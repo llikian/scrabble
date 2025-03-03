@@ -5,19 +5,14 @@
 
 #pragma once
 
+#include "Position.hpp"
+
 enum class BonusType : unsigned char {
     None,
     LetterX2,
     LetterX3,
     WordX2,
     WordX3
-};
-
-struct Position {
-    unsigned int x;
-    unsigned int y;
-
-    bool operator==(const Position& pos) const;
 };
 
 struct Spot {

@@ -8,48 +8,14 @@
 #include <string>
 #include <vector>
 
-#include "Bag.hpp"
 #include "Dictionary.hpp"
+#include "Direction.hpp"
+#include "Move.hpp"
 #include "Player.hpp"
+#include "Position.hpp"
 #include "Spot.hpp"
 
 #define BOARD_SIZE 15
-
-enum Direction : bool {
-    VERTICAL, //0
-    HORIZONTAL //1
-};
-
-struct Hand {
-    Hand(const Player& player);
-    Hand(const Hand& hand);
-    Hand(const Hand& hand, int removedLetterIndex);
-    void operator=(const Hand& hand);
-
-    char letters[7];
-    int capacity;
-};
-
-struct State {
-    State(const Position& position, Node* node, const std::string& word, const Hand& hand);
-
-    State(const Position& position, Node* node, const std::string& word, const Hand& hand, bool foundPlus);
-
-    Position position;
-    Node* node;
-    std::string word; // Word as it is in the gaddag
-    Hand hand;
-    bool foundPlus;
-};
-
-struct Move {
-    Position start; // Position where the search started
-    Direction direction;
-    std::string word; // Word as it is in the gaddag
-    unsigned int points;
-
-    static bool compareByPoints(const Move& m1, const Move& m2);
-};
 
 /**
  * @struct Board
@@ -61,6 +27,9 @@ public:
 
     void loadFromFile(const std::string& path);
     void saveToFile(const std::string& path) const;
+
+    bool isPositionValid(const Position& position) const;
+    bool isCoordinateValid(unsigned int coord) const;
 
     char& operator ()(int row, int column);
     BonusType getBonusType(int row, int column) const;
