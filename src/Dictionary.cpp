@@ -6,9 +6,7 @@
 #include "Dictionary.hpp"
 
 #include <algorithm>
-#include <cassert>
 #include <fstream>
-#include <iostream>
 #include "Board.hpp"
 
 Node::Node(const char value, const bool isTerminal) : value(value), isTerminal(isTerminal) {
@@ -41,8 +39,7 @@ Node::~Node() {
 
 Dictionary::Dictionary() : root(new Node('\0', false)) { }
 
-Dictionary::Dictionary(const std::string& loadPath)
-    : root(new Node('\0', false)) {
+Dictionary::Dictionary(const std::string& loadPath) : root(new Node('\0', false)) {
     std::ifstream file(loadPath);
     if(!file.is_open()) {
         throw std::runtime_error("Couldn't open file \"" + loadPath + "\".");
@@ -104,76 +101,4 @@ bool Dictionary::containWord(const std::string& word) const {
     }
 
     return current->isTerminal;
-}
-
-void Dictionary::unitTests() {
-    std::cout << "Dictionnary Unit Tests:\n";
-
-    /* Manual Insertion Test */ {
-        Dictionary dico;
-
-        dico.insertWord("abc");
-        // assert(dico.root->children[0]->children[1]->children[2]->value == 'C');
-        assert(dico.containWord("ABC"));
-        assert(!dico.containWord("A"));
-        assert(!dico.containWord("ABCE"));
-        assert(!dico.containWord("SKIBIDI"));
-
-        dico.insertGADDAGWord("ABC");
-        assert(!dico.containWord("+ABC"));
-        assert(dico.containWord("A+BC"));
-        assert(dico.containWord("BA+C"));
-        assert(dico.containWord("CBA+"));
-
-        std::cout << "  Manual Insertion Test passed !\n";
-    }
-
-    /* File Insertion Test */ {
-        Dictionary dico;
-        std::ifstream file("data/dico.txt");
-        std::string word;
-        while(file >> word) {
-            if(!word.empty() && word.size() <= BOARD_SIZE) {
-                dico.insertWord(word);
-            }
-        }
-
-        assert(dico.containWord("AA"));
-        assert(!dico.containWord("AAHJG"));
-        assert(dico.containWord("MUTAZILISMES"));
-        assert(!dico.containWord("VHJIDVU"));
-
-        std::cout << "  File Insertion Test passed !\n";
-    }
-
-    /* Full Dictionary Test */ {
-        Dictionary dico("data/dico.txt");
-
-        assert(dico.containWord("F+ROMAGE"));
-        assert(dico.containWord("PPAN+ASSIONS"));
-        assert(!dico.containWord("BAC+C"));
-        assert(!dico.containWord("A"));
-        assert(!dico.containWord("ABC"));
-
-        std::ifstream file("data/dico.txt");
-        std::string word;
-
-        while(file >> word) {
-            if(!word.empty() && word.size() <= 15) {
-                int len = word.length();
-
-                word.insert(0, "+");
-                assert(!dico.containWord(word));
-
-                for(int i = 1 ; i <= len ; i++) {
-                    std::rotate(word.begin(), word.begin() + i, word.begin() + i + 1);
-                    assert(dico.containWord(word));
-                }
-            }
-        }
-
-        std::cout << "  Full Dictionary Test passed !\n";
-    }
-
-    std::cout << "All Dictionary Unit Tests passed !\n\n";
 }
