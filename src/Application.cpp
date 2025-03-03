@@ -17,7 +17,6 @@ Application::Application()
       board(bag, dictionary),
       player(bag),
       squareLength(0) {
-
     if(SDL_Init(SDL_INIT_VIDEO) != 0) {
         throw std::runtime_error(std::string("SDL_Init failed: ").append(SDL_GetError()));
     }
@@ -113,8 +112,9 @@ void Application::drawText(int x, int y, const std::string& text, Uint8 r, Uint8
 void Application::drawCenteredText(const SDL_Rect& reference, const std::string& text, Uint8 r, Uint8 g, Uint8 b) {
     SDL_Surface* surface = TTF_RenderText_Solid(font, text.c_str(), SDL_Color(r, g, b, 255));
     if(surface == nullptr) {
-        std::cout<<std::endl;
-        throw std::runtime_error(std::string("TTF_RenderText_Solid failed: ") + SDL_GetError() + (" on text ") + text.c_str());
+        std::cout << std::endl;
+        throw std::runtime_error(
+            std::string("TTF_RenderText_Solid failed: ") + SDL_GetError() + (" on text ") + text.c_str());
     }
 
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
@@ -170,6 +170,12 @@ void Application::handleInputs(SDL_Scancode scancode) {
         case SDL_SCANCODE_SPACE:
             if(!keysFlags[scancode]) {
                 board.getAllMoves(player);
+                keysFlags.at(scancode) = true;
+            }
+            break;
+        case SDL_SCANCODE_R:
+            if(!keysFlags[scancode]) {
+                board.playMostPointsMove(player);
                 keysFlags.at(scancode) = true;
             }
             break;
