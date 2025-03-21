@@ -11,6 +11,12 @@ Hand::Hand(const Player& player) : capacity(player.capacity) {
     }
 }
 
+Hand::Hand(const char hand[HAND_SIZE]) : capacity(HAND_SIZE) {
+    for(unsigned int i = 0 ; i < capacity ; ++i) {
+        letters[i] = hand[i];
+    }
+}
+
 Hand::Hand(const Hand& hand) : capacity(hand.capacity) {
     for(unsigned int i = 0 ; i < capacity ; ++i) {
         letters[i] = hand.letters[i];

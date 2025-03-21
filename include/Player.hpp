@@ -5,9 +5,8 @@
 
 #pragma once
 
+#include "Board.hpp"
 #include "Bag.hpp"
-
-#define HAND_SIZE 7
 
 /**
  * @struct Player
@@ -22,4 +21,7 @@ struct Player {
     unsigned int points;
 
     void refreshHand(const std::string& usedLetters);
+
+    void playMove(Board & board, const Move& move);
+    void playMostPointsMove(Board& board);
 };

@@ -13,11 +13,12 @@
  */
 struct Hand {
     Hand(const Player& player);
+    Hand(const char hand[HAND_SIZE]);
     Hand(const Hand& hand);
     Hand(const Hand& hand, unsigned int removedLetterIndex);
     void operator=(const Hand& hand);
 
-    char letters[7];
+    char letters[HAND_SIZE];
     unsigned int capacity;
 
     static void unitTests();

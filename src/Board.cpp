@@ -241,10 +241,10 @@ void Board::sortMoveByPoints(std::vector<Move>& moves) const
     std::sort(moves.begin(), moves.end(), operator>);
 }
 
-void Board::checkForWords(Player& player, const Spot* startSpot, std::vector<Move>& moves, const Direction& direction) const {
+void Board::checkForWords(const char hand[HAND_SIZE], const Spot* startSpot, std::vector<Move>& moves, const Direction& direction) const {
     std::stack<State> stack;
 
-    State init(startSpot->position, dictionay.root, "", Hand(player));
+    State init(startSpot->position, dictionay.root, "", Hand(hand));
     stack.push(init);
     while(!stack.empty()) {
         const State top = stack.top();
@@ -299,7 +299,7 @@ void Board::checkForWords(Player& player, const Spot* startSpot, std::vector<Mov
     }
 }
 
-std::vector<Move> Board::getAllMoves(Player& player, const bool print) const {
+std::vector<Move> Board::getAllMoves(const char hand[HAND_SIZE], const bool print) const {
     /* ---- Find possible start positions ---- */
     std::unordered_set<const Spot*> startPositions;
     std::vector<Move> moves;
@@ -326,8 +326,8 @@ std::vector<Move> Board::getAllMoves(Player& player, const bool print) const {
     }
 
     for(const Spot* startSpot : startPositions) {
-        checkForWords(player, startSpot, moves, HORIZONTAL);
-        checkForWords(player, startSpot, moves, VERTICAL);
+        checkForWords(hand, startSpot, moves, HORIZONTAL);
+        checkForWords(hand, startSpot, moves, VERTICAL);
     }
 
     sortMoveByPoints(moves);
@@ -343,70 +343,4 @@ std::vector<Move> Board::getAllMoves(Player& player, const bool print) const {
     return moves;
 }
 
-Move Board::getMostPointsMove(Player& player) const
-{
-    return getAllMoves(player)[0];
-}
 
-void Board::playMove(Player& player, const Move& move)
-{
-    std::string usedLetters;
-
-    bool backward = true;
-    Position spotPos(move.start.x, move.start.y);
-
-    //Place move word on board
-    for (int i = 0; i < static_cast<int>(move.word.length()); ++i)
-    {
-        if (move.word[i] == '+') // End of backward path
-        {
-            spotPos.x = move.start.x  + move.direction;
-            spotPos.y = move.start.y  + !move.direction;
-            backward = false;
-            continue;
-        }
-        if(spotPos.x >= BOARD_SIZE || spotPos.y >= BOARD_SIZE)
-            continue;
-
-        Spot* currentSpot = &board[spotPos.x][spotPos.y];
-        if (currentSpot->character == '\0') {
-            currentSpot->character = move.word[i];
-
-            usedLetters += move.word[i];
-            std::cout<<"Placed letter "<< board[spotPos.x][spotPos.y].character <<
-                " at " << currentSpot->position.x <<"," << currentSpot->position.y << std::endl;
-        }
-        else if (currentSpot->character != move.word[i]) //Placing another letter on taken spot
-        {
-            throw std::runtime_error("Placing invalid letter " + move.word[i]);
-        }
-
-        // Move on board in wanted direction
-        if (backward) {
-            spotPos.x -= move.direction;
-            spotPos.y -= !move.direction;
-        }
-        else {
-            spotPos.x += move.direction;
-            spotPos.y += !move.direction;
-        }
-    }
-
-    //Add move points to player
-    player.points += move.points;
-
-    //Remove used letters from player hand
-    player.refreshHand(usedLetters);
-}
-
-void Board::playMostPointsMove(Player& player)
-{
-    Move bestMove = getMostPointsMove(player);
-
-    std::cout<<"Playing best move : "<<std::endl;
-    std::cout << (bestMove.direction ? "[V] " : "[H] ");
-    std::cout << '(' << bestMove.start.x << ", " << bestMove.start.y << ") ";
-    std::cout << bestMove.word << " : " << bestMove.points << " points" << '\n';
-
-    playMove(player, bestMove);
-}
