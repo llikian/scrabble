@@ -32,6 +32,7 @@ struct Prediction {
     int possiblePoints;
 
     Prediction(const Move move): move(move), possiblePoints(0) {}
+    Prediction(const Move move, int points): move(move), possiblePoints(points) {}
 };
 
 struct MonteCarloPlayer : Player {

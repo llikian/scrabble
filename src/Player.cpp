@@ -92,7 +92,14 @@ void Player::playBestMove(Board &board) {
 
 
 Prediction MonteCarloPlayer::evaluateMove(const Move& move, int iterations, int maxForwardMoves, float maxPonderTime) {
+    int points = 0;
 
+    for (int i = 0; i < iterations; ++i)
+    {
+        // Add to points the points gained by (until end of game/maxForwardMoves) moves
+    }
+
+    return {move, points/iterations};
 }
 
 Move MonteCarloPlayer::getBestEvaluatedMove(const std::vector<Move>& moves, int iterations, int maxForwardMoves, int maxMoveCheck, float maxPonderTime) {
@@ -106,7 +113,7 @@ Move MonteCarloPlayer::getBestEvaluatedMove(const std::vector<Move>& moves, int 
     Prediction bestMove(moves[0]);
 
     for (int i = 0; i < maxMoveCheck; ++i) {
-        Prediction pred = evaluateMove(moves[i], maxForwardMoves, maxPonderTime);
+        Prediction pred = evaluateMove(moves[i], iterations, maxForwardMoves, maxPonderTime);
         if (pred.possiblePoints > bestMove.possiblePoints)
             bestMove = pred;
     }
