@@ -37,8 +37,8 @@ struct Prediction {
 struct MonteCarloPlayer : Player {
     using Player::Player;
 
-    Prediction evaluateMove(const Move& move, int maxForwardMoves = 0, float maxPonderTime = 0);
-    Move getBestEvaluatedMove(const std::vector<Move>& moves, int maxForwardMoves = 0, int maxMoveCheck = 0, float maxPonderTime = 0);
+    Prediction evaluateMove(const Move& move, int iterations, int maxForwardMoves = 0, float maxPonderTime = 0);
+    Move getBestEvaluatedMove(const std::vector<Move>& moves, int iterations, int maxForwardMoves = 0, int maxMoveCheck = 0, float maxPonderTime = 0);
 
     void playBestMove(Board& board) override;
 };

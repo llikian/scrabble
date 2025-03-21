@@ -91,11 +91,11 @@ void Player::playBestMove(Board &board) {
 }
 
 
-Prediction MonteCarloPlayer::evaluateMove(const Move& move, int maxForwardMoves, float maxPonderTime) {
+Prediction MonteCarloPlayer::evaluateMove(const Move& move, int iterations, int maxForwardMoves, float maxPonderTime) {
 
 }
 
-Move MonteCarloPlayer::getBestEvaluatedMove(const std::vector<Move>& moves, int maxForwardMoves, int maxMoveCheck, float maxPonderTime) {
+Move MonteCarloPlayer::getBestEvaluatedMove(const std::vector<Move>& moves, int iterations, int maxForwardMoves, int maxMoveCheck, float maxPonderTime) {
     if(moves.empty()) {
         throw std::runtime_error(std::string("MonteCarlo Player : No moves to play"));
     }
@@ -116,7 +116,7 @@ Move MonteCarloPlayer::getBestEvaluatedMove(const std::vector<Move>& moves, int 
 
 
 void MonteCarloPlayer::playBestMove(Board &board) {
-    Move bestMove = getBestEvaluatedMove(board.getAllMoves(hand));
+    Move bestMove = getBestEvaluatedMove(board.getAllMoves(hand), 10);
 
     std::cout<<"Playing Big Brain move : "<<std::endl;
     std::cout << (bestMove.direction ? "[V] " : "[H] ");
