@@ -46,7 +46,7 @@ private:
     const Bag& bag;
     const Dictionary& dictionay;
 
-    int getWordPoints(const Spot& startSpot, const Direction& direction) const;
+    int getWordPoints(const Spot& startSpot, char startLetter, const Direction& direction) const;
     void applyBonusPoints(Move& move) const;
     void checkForWords(Player& player, const Spot* startSpot, std::vector<Move>& moves, const Direction& direction) const;
 };

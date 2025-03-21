@@ -121,10 +121,10 @@ BonusType Board::getBonusType(int row, int column) const {
     return board[row][column].type;
 }
 
-int Board::getWordPoints(const Spot& startSpot, const Direction& direction) const
+int Board::getWordPoints(const Spot& startSpot, char startLetter, const Direction& direction) const
 {
-    std::string word;
-    Position spotPos(startSpot.position.x, startSpot.position.y);
+    std::string word{startLetter};
+    Position spotPos(startSpot.position.x - direction, startSpot.position.y - direction);
 
     while (spotPos.x < BOARD_SIZE && spotPos.y < BOARD_SIZE && board[spotPos.x][spotPos.y].character != '\0')
     {
@@ -145,11 +145,13 @@ int Board::getWordPoints(const Spot& startSpot, const Direction& direction) cons
     }
 
     // The letter don't create new words
-    if (word.length() <= 1)
+    if (word.length() <= 2)
         return 0;
 
     if (dictionay.containWord(word))
+    {
         return Bag::getWordPoints(word);
+    }
 
     // The letter create invalid words
     return -1;
@@ -177,8 +179,9 @@ void Board::applyBonusPoints(Move& move) const
         Spot currentSpot = board[spotPos.x][spotPos.y];
 
         // Check for crossing words
-        int adjacentWordPoints = getWordPoints(currentSpot, static_cast<Direction>(!move.direction)); // Perpendicular direction
+        int adjacentWordPoints = getWordPoints(currentSpot, move.word[i], static_cast<Direction>(!move.direction)); // Perpendicular direction
         if (adjacentWordPoints == -1) { //Crossing invalid words, move is invalid
+            // std::cout<<"Filtered move " << move.word << " by crossing invalid words" << std::endl;
             move.points = 0;
             return;
         }
@@ -257,6 +260,7 @@ void Board::checkForWords(Player& player, const Spot* startSpot, std::vector<Mov
                 applyBonusPoints(move);
 
                 if(move.points > 0) { // If the move is valid
+                    // std::cout<<"Added move " << move.word << " for " << move.points << " points" << std::endl;
                     moves.emplace_back(move);
                 }
             }
