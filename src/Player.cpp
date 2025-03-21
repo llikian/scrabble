@@ -15,8 +15,7 @@ Player::Player(Bag& bag)
     }
 }
 
-void Player::refreshHand(const std::string& usedLetters)
-{
+void Player::refreshHand(const std::string& usedLetters) {
     for (char used_letter : usedLetters) {
         for (char & c : hand) {
             if(c == used_letter) {
@@ -30,8 +29,7 @@ void Player::refreshHand(const std::string& usedLetters)
     }
 }
 
-void Player::playMove(Board &board, const Move& move)
-{
+void Player::playMove(Board &board, const Move& move) {
     std::string usedLetters;
 
     bool backward = true;
@@ -81,8 +79,7 @@ void Player::playMove(Board &board, const Move& move)
     refreshHand(usedLetters);
 }
 
-void Player::playBestMove(Board &board)
-{
+void Player::playBestMove(Board &board) {
     Move bestMove = board.getAllMoves(hand)[0];
 
     std::cout<<"Playing most points move : "<<std::endl;
@@ -93,9 +90,33 @@ void Player::playBestMove(Board &board)
     playMove(board, bestMove);
 }
 
-void MonteCarloPlayer::playBestMove(Board &board)
-{
-    Move bestMove = board.getAllMoves(hand)[0];
+
+Prediction MonteCarloPlayer::evaluateMove(const Move& move, int maxForwardMoves, float maxPonderTime) {
+
+}
+
+Move MonteCarloPlayer::getBestEvaluatedMove(const std::vector<Move>& moves, int maxForwardMoves, int maxMoveCheck, float maxPonderTime) {
+    if(moves.empty()) {
+        throw std::runtime_error(std::string("MonteCarlo Player : No moves to play"));
+    }
+
+    if(maxMoveCheck <= 0)
+       maxMoveCheck = moves.size();
+
+    Prediction bestMove(moves[0]);
+
+    for (int i = 0; i < maxMoveCheck; ++i) {
+        Prediction pred = evaluateMove(moves[i], maxForwardMoves, maxPonderTime);
+        if (pred.possiblePoints > bestMove.possiblePoints)
+            bestMove = pred;
+    }
+
+    return bestMove.move;
+}
+
+
+void MonteCarloPlayer::playBestMove(Board &board) {
+    Move bestMove = getBestEvaluatedMove(board.getAllMoves(hand));
 
     std::cout<<"Playing Big Brain move : "<<std::endl;
     std::cout << (bestMove.direction ? "[V] " : "[H] ");

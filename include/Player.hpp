@@ -28,16 +28,17 @@ struct Player {
 };
 
 struct Prediction {
-    Move* move;
+    Move move;
     int possiblePoints;
 
-    Prediction(Move* move): move(move), possiblePoints(0) {}
+    Prediction(const Move move): move(move), possiblePoints(0) {}
 };
 
 struct MonteCarloPlayer : Player {
+    using Player::Player;
 
-    Prediction evaluateMove(const Move& move, int maxForwardMoves);
-    Move evaluateAllMoves(const std::vector<Move>& moves, int maxWordCheck, int maxForwardMoves);
+    Prediction evaluateMove(const Move& move, int maxForwardMoves = 0, float maxPonderTime = 0);
+    Move getBestEvaluatedMove(const std::vector<Move>& moves, int maxForwardMoves = 0, int maxMoveCheck = 0, float maxPonderTime = 0);
 
     void playBestMove(Board& board) override;
 };
