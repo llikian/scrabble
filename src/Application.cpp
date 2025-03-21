@@ -46,7 +46,7 @@ Application::Application()
 
     board.loadFromFile("data/boards/board1.txt");
     // board.getAllMoves(player);
-    player.playMostPointsMove(board); //TODO Faire marcher ça
+    player.playBestMove(board); //TODO Faire marcher ça
 }
 
 Application::~Application() {
@@ -175,7 +175,7 @@ void Application::handleInputs(SDL_Scancode scancode) {
             break;
         case SDL_SCANCODE_R:
             if(!keysFlags[scancode]) {
-                player.playMostPointsMove(board);
+                player.playBestMove(board);
                 keysFlags.at(scancode) = true;
             }
             break;

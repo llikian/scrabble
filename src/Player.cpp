@@ -81,11 +81,23 @@ void Player::playMove(Board &board, const Move& move)
     refreshHand(usedLetters);
 }
 
-void Player::playMostPointsMove(Board &board)
+void Player::playBestMove(Board &board)
 {
     Move bestMove = board.getAllMoves(hand)[0];
 
-    std::cout<<"Playing best move : "<<std::endl;
+    std::cout<<"Playing most points move : "<<std::endl;
+    std::cout << (bestMove.direction ? "[V] " : "[H] ");
+    std::cout << '(' << bestMove.start.x << ", " << bestMove.start.y << ") ";
+    std::cout << bestMove.word << " : " << bestMove.points << " points" << '\n';
+
+    playMove(board, bestMove);
+}
+
+void MonteCarloPlayer::playBestMove(Board &board)
+{
+    Move bestMove = board.getAllMoves(hand)[0];
+
+    std::cout<<"Playing Big Brain move : "<<std::endl;
     std::cout << (bestMove.direction ? "[V] " : "[H] ");
     std::cout << '(' << bestMove.start.x << ", " << bestMove.start.y << ") ";
     std::cout << bestMove.word << " : " << bestMove.points << " points" << '\n';
