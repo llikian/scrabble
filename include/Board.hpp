@@ -10,12 +10,12 @@
 
 #include "Dictionary.hpp"
 #include "Direction.hpp"
+#include "Hand.hpp"
 #include "Move.hpp"
 #include "Position.hpp"
 #include "Spot.hpp"
 
 #define BOARD_SIZE 15
-#define HAND_SIZE 7
 
 struct Player;
 
@@ -39,7 +39,7 @@ public:
     BonusType getBonusType(int row, int column) const;
 
     void sortMoveByPoints(std::vector<Move>& moves) const;
-    std::vector<Move> getAllMoves(const char hand[HAND_SIZE], bool print = false) const;
+    std::vector<Move> getAllMoves(const Hand& hand, bool print = false) const;
 
 private:
     const Bag& bag;
@@ -47,5 +47,5 @@ private:
 
     int getWordPoints(const Spot& startSpot, char startLetter, const Direction& direction) const;
     void applyBonusPoints(Move& move) const;
-    void checkForWords(const char hand[HAND_SIZE], const Spot* startSpot, std::vector<Move>& moves, const Direction& direction) const;
+    void checkForWords(const Hand& hand, const Spot* startSpot, std::vector<Move>& moves, const Direction& direction) const;
 };

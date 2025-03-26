@@ -5,7 +5,9 @@
 
 #pragma once
 
-#include "Player.hpp"
+#define HAND_SIZE 7
+
+struct Player;
 
 /**
  * @struct Hand
@@ -13,7 +15,6 @@
  */
 struct Hand {
     Hand(const Player& player);
-    Hand(const char hand[HAND_SIZE]);
     Hand(const Hand& hand);
     Hand(const Hand& hand, unsigned int removedLetterIndex);
     void operator=(const Hand& hand);

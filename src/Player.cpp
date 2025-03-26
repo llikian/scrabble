@@ -80,7 +80,13 @@ void Player::playMove(Board &board, const Move& move) {
 }
 
 void Player::playBestMove(Board &board) {
-    Move bestMove = board.getAllMoves(hand)[0];
+    std::vector<Move> moves = board.getAllMoves(Hand(*this));
+    if(moves.empty()) {
+        std::cout << "No moves were found.\n";
+        return;
+    }
+
+    Move bestMove = moves[0];
 
     std::cout<<"Playing most points move : "<<std::endl;
     std::cout << (bestMove.direction ? "[V] " : "[H] ");
@@ -123,7 +129,7 @@ Move MonteCarloPlayer::getBestEvaluatedMove(const std::vector<Move>& moves, int 
 
 
 void MonteCarloPlayer::playBestMove(Board &board) {
-    Move bestMove = getBestEvaluatedMove(board.getAllMoves(hand), 10);
+    Move bestMove = getBestEvaluatedMove(board.getAllMoves(Hand(*this)), 10);
 
     std::cout<<"Playing Big Brain move : "<<std::endl;
     std::cout << (bestMove.direction ? "[V] " : "[H] ");

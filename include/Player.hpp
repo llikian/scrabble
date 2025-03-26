@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "Board.hpp"
 #include "Bag.hpp"
+#include "Board.hpp"
 
 /**
  * @struct Player
