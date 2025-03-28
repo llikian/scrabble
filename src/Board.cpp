@@ -14,7 +14,7 @@
 #include "State.hpp"
 
 Board::Board(const Bag& bag, const Dictionary& dictionary)
-    : bag(bag), dictionay(dictionary) {
+    : bag(bag), dictionary(dictionary) {
     static constexpr char rawBoard[BOARD_SIZE][BOARD_SIZE + 1]{
         "3..d...3...d..3",
         ".2...t...t...2.",
@@ -143,7 +143,7 @@ int Board::getWordPoints(const Spot& startSpot, char startLetter, const Directio
     // The letter doesn't create new words
     if(word.length() <= 2) { return 0; }
 
-    if(dictionay.containWord(word)) { return Bag::getWordPoints(word); }
+    if(dictionary.containWord(word)) { return Bag::getWordPoints(word); }
 
     // The letter creates invalid words
     return -1;
@@ -230,7 +230,7 @@ void Board::checkForWords(const Hand& hand,
                           const Direction& direction) const {
     std::stack<State> stack;
 
-    State init(startSpot->position, dictionay.root, "", hand);
+    State init(startSpot->position, dictionary.root, "", hand);
     stack.push(init);
     while(!stack.empty()) {
         const State top = stack.top();
@@ -241,12 +241,12 @@ void Board::checkForWords(const Hand& hand,
 
         if(spot.isEmpty()) { // Spot is empty
             // We found a correct word
-            if(top.node->isTerminal) {
-                Position position = direction
+            if(top.foundPlus && top.node->isTerminal) {
+                Position nextPos = direction
                                         ? Position(top.position.x + shift, top.position.y)
                                         : Position(top.position.x, top.position.y + shift);
 
-                if(!isPositionValid(position) || board[position.x][position.y].isEmpty()) {
+                if(!isPositionValid(nextPos) || board[nextPos.x][nextPos.y].isEmpty()) {
                     Move move(startSpot->position, direction, top.word, 0);
                     applyBonusPoints(move);
 
@@ -335,4 +335,31 @@ std::vector<Move> Board::getAllMoves(const Hand& hand, const bool print) const {
     }
 
     return moves;
+}
+
+bool Board::testAllWordsOnBoard() const {
+    constexpr static Direction directions[2] { VERTICAL, HORIZONTAL };
+
+    for(Direction direction : directions) {
+        std::string word = "+";
+
+        for(unsigned int i = 0 ; i < BOARD_SIZE ; ++i) {
+            for(unsigned int j = 0 ; j < BOARD_SIZE ; ++j) {
+                if(board[i][j].isEmpty()) { continue; }
+
+                Position nextPos(i + direction, j + !direction);
+
+                if(word.size() > 1 && (!isPositionValid(nextPos) || board[nextPos.x][nextPos.y].isEmpty())) {
+                    if(!dictionary.containWord(word)) { return false; }
+                    word = "+";
+                } else {
+                    word += board[i][j].character;
+                }
+            }
+
+            word = "+";
+        }
+    }
+
+    return true;
 }

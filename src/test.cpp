@@ -11,6 +11,7 @@
 #include "Board.hpp"
 #include "Dictionary.hpp"
 #include "Hand.hpp"
+#include "Player.hpp"
 
 void Dictionary::unitTests() {
     std::cout << "Dictionnary Unit Tests:\n";

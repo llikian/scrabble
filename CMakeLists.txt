@@ -54,9 +54,14 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${INCLUDES})
 target_link_libraries(${PROJECT_NAME} PUBLIC ${LIBRARIES})
 
 # Tests Executable
-add_executable(Tests src/test.cpp ${SOURCES})
-target_include_directories(Tests PUBLIC ${INCLUDES})
-target_link_libraries(Tests PUBLIC ${LIBRARIES})
+add_executable(tests src/test.cpp ${SOURCES})
+target_include_directories(tests PUBLIC ${INCLUDES})
+target_link_libraries(tests PUBLIC ${LIBRARIES})
+
+# Board Tests Executable
+add_executable(board_tests src/board_tests.cpp ${SOURCES})
+target_include_directories(board_tests PUBLIC ${INCLUDES})
+target_link_libraries(board_tests PUBLIC ${LIBRARIES})
 
 # Set output directories
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)

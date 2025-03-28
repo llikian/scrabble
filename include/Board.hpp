@@ -41,9 +41,11 @@ public:
     void sortMoveByPoints(std::vector<Move>& moves) const;
     std::vector<Move> getAllMoves(const Hand& hand, bool print = false) const;
 
+    bool testAllWordsOnBoard() const;
+
 private:
     const Bag& bag;
-    const Dictionary& dictionay;
+    const Dictionary& dictionary;
 
     int getWordPoints(const Spot& startSpot, char startLetter, const Direction& direction) const;
     void applyBonusPoints(Move& move) const;
