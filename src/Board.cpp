@@ -243,8 +243,8 @@ void Board::checkForWords(const Hand& hand,
             // We found a correct word
             if(top.foundPlus && top.node->isTerminal) {
                 Position nextPos = direction
-                                        ? Position(top.position.x + shift, top.position.y)
-                                        : Position(top.position.x, top.position.y + shift);
+                                       ? Position(top.position.x + shift, top.position.y)
+                                       : Position(top.position.x, top.position.y + shift);
 
                 if(!isPositionValid(nextPos) || board[nextPos.x][nextPos.y].isEmpty()) {
                     Move move(startSpot->position, direction, top.word, 0);
@@ -338,26 +338,30 @@ std::vector<Move> Board::getAllMoves(const Hand& hand, const bool print) const {
 }
 
 bool Board::testAllWordsOnBoard() const {
-    constexpr static Direction directions[2] { VERTICAL, HORIZONTAL };
+    constexpr static Direction directions[2]{ VERTICAL, HORIZONTAL };
 
     for(Direction direction : directions) {
         std::string word = "+";
 
-        for(unsigned int i = 0 ; i < BOARD_SIZE ; ++i) {
-            for(unsigned int j = 0 ; j < BOARD_SIZE ; ++j) {
+        for(int i = BOARD_SIZE - 1 ; i >= 0 ; --i) {
+            for(int j = BOARD_SIZE - 1 ; j >= 0 ; --j) {
                 if(board[i][j].isEmpty()) { continue; }
 
                 Position nextPos(i + direction, j + !direction);
+                word += board[i][j].character;
 
-                if(word.size() > 1 && (!isPositionValid(nextPos) || board[nextPos.x][nextPos.y].isEmpty())) {
-                    if(!dictionary.containWord(word)) { return false; }
-                    word = "+";
-                } else {
-                    word += board[i][j].character;
+                if(word.size() > 2 && (!isPositionValid(nextPos) || board[nextPos.x][nextPos.y].isEmpty())) {
+                    if(!dictionary.containWord(word + '+')) {
+                        std::cerr << "Incorrect word \"" << word << "\" found.\n";
+                        return false;
+                    }
+
+                    std::cout << "Correct word \"" << word << "\" found.\n";
+                    word.clear();
                 }
-            }
 
-            word = "+";
+                word.clear();
+            }
         }
     }
 

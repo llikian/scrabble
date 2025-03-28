@@ -3,7 +3,6 @@
  * @brief Contains the unit tests for the project
  **************************************************************************************************/
 
-#include <cassert>
 #include <fstream>
 #include <iostream>
 
@@ -14,16 +13,16 @@
 
 int main() {
     Dictionary dictionary("data/dico.txt");;
-    Bag(bag);
+    Bag bag;
     Player player(bag);
     Board board(bag, dictionary);
 
-    for(unsigned int i = 0 ; i < 2 ; ++i) { player.playBestMove(board); }
+    for(unsigned int i = 0 ; i < 20 ; ++i) { player.playBestMove(board, false); }
 
-    if(!board.testAllWordsOnBoard()) {
-        std::cerr << "Invalid words found on board !\n";
-        return -1;
-    }
+    std::cout << '\n';
+
+    if(!board.testAllWordsOnBoard()) { return -1; }
+    std::cout << "No incorrect words were found on the board.\n";
 
     return 0;
 }
