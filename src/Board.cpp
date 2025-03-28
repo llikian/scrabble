@@ -124,7 +124,7 @@ int Board::getWordPoints(const Spot& startSpot, char startLetter, const Directio
     std::string word{ startLetter };
     Position spotPos(startSpot.position.x - direction, startSpot.position.y - !direction);
 
-    while(spotPos.x < BOARD_SIZE && spotPos.y < BOARD_SIZE && board[spotPos.x][spotPos.y].character != '\0') {
+    while(isPositionValid(spotPos) && !board[spotPos.x][spotPos.y].isEmpty()) {
         word += board[spotPos.x][spotPos.y].character;
         spotPos.x -= direction;
         spotPos.y -= !direction;
@@ -134,13 +134,13 @@ int Board::getWordPoints(const Spot& startSpot, char startLetter, const Directio
     spotPos.x = startSpot.position.x + direction;
     spotPos.y = startSpot.position.y + !direction;
 
-    while(spotPos.x < BOARD_SIZE && spotPos.y < BOARD_SIZE && board[spotPos.x][spotPos.y].character != '\0') {
+    while(isPositionValid(spotPos) && !board[spotPos.x][spotPos.y].isEmpty()) {
         word += board[spotPos.x][spotPos.y].character;
         spotPos.x += direction;
         spotPos.y += !direction;
     }
 
-    // The letter don't create new words
+    // The letter doesn't create new words
     if(word.length() <= 2) { return 0; }
 
     if(dictionay.containWord(word)) { return Bag::getWordPoints(word); }
@@ -162,6 +162,7 @@ void Board::applyBonusPoints(Move& move) const {
             backward = false;
             continue;
         }
+
         if(spotPos.x >= BOARD_SIZE || spotPos.y >= BOARD_SIZE) { continue; }
 
         Spot currentSpot = board[spotPos.x][spotPos.y];
@@ -175,7 +176,7 @@ void Board::applyBonusPoints(Move& move) const {
             return;
         }
 
-        if(currentSpot.character != '\0') {
+        if(!currentSpot.isEmpty()) {
             //If it's not a new character from this move, don't apply bonus
             move.points += Bag::getPoints(move.word[i]);
         } else {
@@ -238,15 +239,21 @@ void Board::checkForWords(const Hand& hand,
         const Spot& spot = board[top.position.x][top.position.y];
         const unsigned int shift = top.foundPlus ? 1 : -1;
 
-        if(spot.character == '\0') { // Spot is empty
+        if(spot.isEmpty()) { // Spot is empty
             // We found a correct word
             if(top.node->isTerminal) {
-                Move move(startSpot->position, direction, top.word, 0);
-                applyBonusPoints(move);
+                Position position = direction
+                                        ? Position(top.position.x + shift, top.position.y)
+                                        : Position(top.position.x, top.position.y + shift);
 
-                if(move.points > 0) { // If the move is valid
-                    // std::cout<<"Added move " << move.word << " for " << move.points << " points" << std::endl;
-                    moves.emplace_back(move);
+                if(!isPositionValid(position) || board[position.x][position.y].isEmpty()) {
+                    Move move(startSpot->position, direction, top.word, 0);
+                    applyBonusPoints(move);
+
+                    if(move.points > 0) { // If the move is valid
+                        // std::cout<<"Added move " << move.word << " for " << move.points << " points" << std::endl;
+                        moves.emplace_back(move);
+                    }
                 }
             }
 
@@ -294,17 +301,17 @@ std::vector<Move> Board::getAllMoves(const Hand& hand, const bool print) const {
     for(int i = 0 ; i < BOARD_SIZE ; ++i) {
         for(int j = 0 ; j < BOARD_SIZE ; ++j) {
             if(board[i][j].character != '\0') { // The spot has a letter on it
-                if(i + 1 < BOARD_SIZE && board[i + 1][j].character == '\0') { startPositions.emplace(&board[i + 1][j]); }
-                if(j + 1 < BOARD_SIZE && board[i][j + 1].character == '\0') { startPositions.emplace(&board[i][j + 1]); }
-                if(i > 0 && board[i - 1][j].character == '\0') { startPositions.emplace(&board[i - 1][j]); }
-                if(j > 0 && board[i][j - 1].character == '\0') { startPositions.emplace(&board[i][j - 1]); }
+                if(i + 1 < BOARD_SIZE && board[i + 1][j].isEmpty()) { startPositions.emplace(&board[i + 1][j]); }
+                if(j + 1 < BOARD_SIZE && board[i][j + 1].isEmpty()) { startPositions.emplace(&board[i][j + 1]); }
+                if(i > 0 && board[i - 1][j].isEmpty()) { startPositions.emplace(&board[i - 1][j]); }
+                if(j > 0 && board[i][j - 1].isEmpty()) { startPositions.emplace(&board[i][j - 1]); }
             }
         }
     }
 
     // No starting positions were found
     if(startPositions.empty()) {
-        if(board[7][7].character == '\0') { // This is the first move
+        if(board[7][7].isEmpty()) { // This is the first move
             startPositions.emplace(&board[7][7]);
         } else { // The board is somehow full
             std::cout << "No starting positions were found.\n";

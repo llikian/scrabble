@@ -19,6 +19,8 @@ struct Spot {
     Spot();
     Spot(char character, BonusType type, unsigned int x, unsigned int y);
 
+    bool isEmpty() const;
+
     char character;
     BonusType type;
     Position position;
