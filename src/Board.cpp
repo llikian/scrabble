@@ -341,26 +341,29 @@ bool Board::testAllWordsOnBoard() const {
     constexpr static Direction directions[2]{ VERTICAL, HORIZONTAL };
 
     for(Direction direction : directions) {
-        std::string word = "+";
-
         for(int i = BOARD_SIZE - 1 ; i >= 0 ; --i) {
+            std::string word;
+
             for(int j = BOARD_SIZE - 1 ; j >= 0 ; --j) {
-                if(board[i][j].isEmpty()) { continue; }
+                if(direction ? board[i][j].isEmpty() : board[j][i].isEmpty()) {
+                    word.clear();
+                    continue;
+                }
 
-                Position nextPos(i + direction, j + !direction);
-                word += board[i][j].character;
+                Position nextPos = direction ? Position(i, j - 1) : Position(j - 1, i);
+                word += direction ? board[i][j].character : board[j][i].character;
 
-                if(word.size() > 2 && (!isPositionValid(nextPos) || board[nextPos.x][nextPos.y].isEmpty())) {
+                if(word.size() > 1 && (!isPositionValid(nextPos) || board[nextPos.x][nextPos.y].isEmpty())) {
                     if(!dictionary.containWord(word + '+')) {
-                        std::cerr << "Incorrect word \"" << word << "\" found.\n";
+                        std::reverse(word.begin(), word.end());
+                        std::cout << "Incorrect word \"" << word << "\" found.\n";
                         return false;
                     }
 
+                    std::reverse(word.begin(), word.end());
                     std::cout << "Correct word \"" << word << "\" found.\n";
                     word.clear();
                 }
-
-                word.clear();
             }
         }
     }
