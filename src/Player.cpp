@@ -75,12 +75,9 @@ void Player::playMove(Board& board, const Move& move, bool verbose) {
     refreshHand(usedLetters);
 }
 
-void Player::playBestMove(Board& board, bool verbose) {
+bool Player::playBestMove(Board& board, bool verbose) {
     std::vector<Move> moves = board.getAllMoves(Hand(*this));
-    if(moves.empty()) {
-        std::cout << "No moves were found.\n";
-        return;
-    }
+    if(moves.empty()) { return false; }
 
     Move bestMove = moves[0];
 
@@ -92,6 +89,8 @@ void Player::playBestMove(Board& board, bool verbose) {
     }
 
     playMove(board, bestMove, verbose);
+
+    return true;
 }
 
 Prediction MonteCarloPlayer::evaluateMove(const Move& move, int iterations, int maxForwardMoves, float maxPonderTime) {
@@ -125,7 +124,7 @@ Move MonteCarloPlayer::getBestEvaluatedMove(const std::vector<Move>& moves,
     return bestMove.move;
 }
 
-void MonteCarloPlayer::playBestMove(Board& board, bool verbose) {
+bool MonteCarloPlayer::playBestMove(Board& board, bool verbose) {
     Move bestMove = getBestEvaluatedMove(board.getAllMoves(Hand(*this)), 10);
 
     if(verbose) {
@@ -136,4 +135,6 @@ void MonteCarloPlayer::playBestMove(Board& board, bool verbose) {
     }
 
     playMove(board, bestMove, verbose);
+
+    return true;
 }

@@ -173,7 +173,9 @@ void Application::handleInputs(SDL_Scancode scancode) {
             break;
         case SDL_SCANCODE_R:
             if(!keysFlags[scancode]) {
-                player.playBestMove(board);
+                if(!player.playBestMove(board)) {
+                    std::cout << "No moves were found.\n";
+                }
                 keysFlags.at(scancode) = true;
             }
             break;

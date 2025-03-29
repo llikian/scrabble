@@ -24,7 +24,7 @@ struct Player {
     void refreshHand(const std::string& usedLetters);
 
     void playMove(Board& board, const Move& move, bool verbose);
-    virtual void playBestMove(Board& board, bool verbose = true);
+    virtual bool playBestMove(Board& board, bool verbose = true);
 };
 
 struct Prediction {
@@ -41,5 +41,5 @@ struct MonteCarloPlayer : Player {
     Prediction evaluateMove(const Move& move, int iterations, int maxForwardMoves = 0, float maxPonderTime = 0);
     Move getBestEvaluatedMove(const std::vector<Move>& moves, int iterations, int maxForwardMoves = 0, int maxMoveCheck = 0, float maxPonderTime = 0);
 
-    void playBestMove(Board& board, bool verbose) override;
+    bool playBestMove(Board& board, bool verbose) override;
 };
