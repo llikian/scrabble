@@ -21,6 +21,8 @@ struct Player {
     unsigned int capacity;
     unsigned int points;
 
+    void init();
+
     void refreshHand(const std::string& usedLetters);
 
     void playMove(Board& board, const Move& move, bool verbose);

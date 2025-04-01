@@ -17,6 +17,8 @@ public:
     Bag();
     ~Bag();
 
+    void init();
+
     char drawLetter();
 
     static unsigned int getPoints(char letter);

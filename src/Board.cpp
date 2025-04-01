@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
-#include <stack>
+#include <queue>
 #include <stdexcept>
 #include <unordered_set>
 #include "State.hpp"
@@ -217,7 +217,7 @@ void Board::applyBonusPoints(Move& move) const {
     move.points *= wordMultiplier;
 
     // Scrabble !
-    if(letterUsed >= 7) move.points += 50;
+    if(letterUsed == HAND_SIZE) move.points += 50;
 }
 
 void Board::sortMoveByPoints(std::vector<Move>& moves) const {
@@ -228,26 +228,25 @@ void Board::checkForWords(const Hand& hand,
                           const Spot* startSpot,
                           std::vector<Move>& moves,
                           const Direction& direction) const {
-    std::stack<State> stack;
+    std::queue<State> queue;
 
     State init(startSpot->position, dictionary.root, "", hand, false);
-    stack.push(init);
-    while(!stack.empty()) {
-        const State top = stack.top();
-        stack.pop();
+    queue.push(init);
+    while(!queue.empty()) {
+        const State& state = queue.front();
 
-        const Spot& spot = board[top.position.x][top.position.y];
-        const unsigned int shift = top.foundPlus ? 1 : -1;
+        const Spot& spot = board[state.position.x][state.position.y];
+        const unsigned int shift = state.foundPlus ? 1 : -1;
 
-        if(spot.isEmpty()) { // Spot is empty
+        if(spot.isEmpty()) {
             // We found a correct word
-            if(top.node->isTerminal) {
+            if(state.node->isTerminal) {
                 Position nextPos = direction
-                                       ? Position(top.position.x + 1, top.position.y)
-                                       : Position(top.position.x, top.position.y + 1);
+                                       ? Position(state.position.x + 1, state.position.y)
+                                       : Position(state.position.x, state.position.y + 1);
 
                 if(!isPositionValid(nextPos) || board[nextPos.x][nextPos.y].isEmpty()) {
-                    Move move(startSpot->position, direction, top.word, 0);
+                    Move move(startSpot->position, direction, state.word, 0);
                     applyBonusPoints(move);
 
                     if(move.points > 0) { // If the move is valid
@@ -258,38 +257,41 @@ void Board::checkForWords(const Hand& hand,
             }
 
             // There is a path labeled with a '+' in the GADDAG
-            if(Node* node = top.node->child('+') ; node != nullptr) {
+            if(Node* node = state.node->child('+') ; node != nullptr) {
                 Position position = direction
                                         ? Position(startSpot->position.x + 1, startSpot->position.y)
                                         : Position(startSpot->position.x, startSpot->position.y + 1);
 
                 if(isPositionValid(position)) {
-                    stack.emplace(position, node, top.word + '+', top.hand, true);
+                    queue.emplace(position, node, state.word + '+', state.hand, true);
                 }
             }
 
             // Create a new state on the stack for each letter from the hand that could be placed
-            for(unsigned int i = 0 ; i < top.hand.capacity ; ++i) {
-                if(Node* node = top.node->child(top.hand.letters[i]) ; node != nullptr) {
+            for(unsigned int i = 0 ; i < state.hand.capacity ; ++i) {
+                const char& letter = state.hand.letters[i];
+                if(Node* node = state.node->child(letter) ; node != nullptr) {
                     Position position = direction
-                                            ? Position(top.position.x + shift, top.position.y)
-                                            : Position(top.position.x, top.position.y + shift);
+                                            ? Position(state.position.x + shift, state.position.y)
+                                            : Position(state.position.x, state.position.y + shift);
 
                     if(isPositionValid(position)) {
-                        stack.emplace(position, node, top.word + top.hand.letters[i], Hand(top.hand, i), top.foundPlus);
+                        queue.emplace(position, node, state.word + letter, Hand(state.hand, i), state.foundPlus);
                     }
                 }
             }
-        } else if(Node* node = top.node->child(spot.character) ; node != nullptr) {
+        } else if(Node* node = state.node->child(spot.character) ; node != nullptr) {
             // There is a path labeled with the letter on the spot in the GADDAG
             Position position = direction
-                                    ? Position(top.position.x + shift, top.position.y)
-                                    : Position(top.position.x, top.position.y + shift);
+                                    ? Position(state.position.x + shift, state.position.y)
+                                    : Position(state.position.x, state.position.y + shift);
 
             if(isPositionValid(position)) {
-                stack.emplace(position, node, top.word + spot.character, top.hand, top.foundPlus);
+                queue.emplace(position, node, state.word + spot.character, state.hand, state.foundPlus);
             }
         }
+
+        queue.pop();
     }
 }
 

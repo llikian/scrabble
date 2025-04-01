@@ -166,7 +166,9 @@ void Application::handleInputs(SDL_Scancode scancode) {
             break;
         case SDL_SCANCODE_SPACE:
             if(!keysFlags[scancode]) {
-                board.getAllMoves(Hand(player));
+                if(!player.playBestMove(board, verbose)) {
+                    std::cout << "No moves were found.\n";
+                }
                 keysFlags.at(scancode) = true;
             }
             break;
@@ -210,11 +212,23 @@ void Application::handleInputs(SDL_Scancode scancode) {
                 keysFlags.at(scancode) = true;
             }
             break;
+        case SDL_SCANCODE_P:
+            if(!keysFlags[scancode]) {
+                board.getAllMoves(Hand(player));
+                keysFlags.at(scancode) = true;
+            }
+            break;
         case SDL_SCANCODE_R:
             if(!keysFlags[scancode]) {
-                if(!player.playBestMove(board, verbose)) {
-                    std::cout << "No moves were found.\n";
+                bag.init();
+                player.init();
+
+                for(unsigned int i = 0 ; i < BOARD_SIZE ; ++i) {
+                    for(unsigned int j = 0 ; j < BOARD_SIZE ; ++j) {
+                        board.board[i][j].character = '\0';
+                    }
                 }
+
                 keysFlags.at(scancode) = true;
             }
             break;
