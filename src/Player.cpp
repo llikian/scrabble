@@ -19,12 +19,23 @@ void Player::refreshHand(const std::string& usedLetters) {
         for(char& c : hand) {
             if(c == used_letter) {
                 c = bag.drawLetter();
-                if(c == 0) {
-                    --capacity;
-                }
+                if(c == '\0') { --capacity; }
                 break;
             }
         }
+    }
+
+    // Make sure the letters are continuous and at the beginning of the array
+    if(capacity < HAND_SIZE) {
+        int pos = 0;
+
+        for(int i = 0 ; i < HAND_SIZE ; ++i) {
+            if(hand[i] != '\0') {
+                hand[pos++] = hand[i];
+            }
+        }
+
+        while(pos < HAND_SIZE) { hand[pos++] = '\0'; }
     }
 }
 
@@ -68,10 +79,10 @@ void Player::playMove(Board& board, const Move& move, bool verbose) {
         }
     }
 
-    //Add move points to player
+    // Add move points to player
     points += move.points;
 
-    //Remove used letters from player hand
+    // Remove used letters from player hand
     refreshHand(usedLetters);
 }
 
