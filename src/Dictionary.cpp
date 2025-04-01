@@ -16,19 +16,17 @@ Node::Node(const char value, const bool isTerminal) : value(value), isTerminal(i
 }
 
 Node*& Node::operator[](char letter) {
-    if(letter >= 'A' && letter <= 'Z') {
-        return children[letter - 'A'];
-    }
+    if(letter >= 'A' && letter <= 'Z') { return children[letter - 'A']; }
+    if(letter == '+') { return children[ALPHABET_SIZE]; }
 
-    return children[ALPHABET_SIZE];
+    throw std::runtime_error("NOPE x(");
 }
 
 Node*& Node::getChild(char letter) {
-    if(letter >= 'A' && letter <= 'Z') {
-        return children[letter - 'A'];
-    }
+    if(letter >= 'A' && letter <= 'Z') { return children[letter - 'A']; }
+    if(letter == '+') { return children[ALPHABET_SIZE]; }
 
-    return children[ALPHABET_SIZE];
+    throw std::runtime_error("NOPE x(");
 }
 
 Node::~Node() {
