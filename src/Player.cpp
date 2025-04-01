@@ -104,39 +104,36 @@ bool Player::playBestMove(Board& board, bool verbose) {
     return true;
 }
 
-Prediction MonteCarloPlayer::evaluateMove(const Move& move, int iterations, int maxForwardMoves, float maxPonderTime) {
-    int points = 0;
-
-    for(int i = 0 ; i < iterations ; ++i) {
-        // Add to points the points gained by (until end of game/maxForwardMoves) moves
-    }
-
-    return { move, points / iterations };
-}
-
-Move MonteCarloPlayer::getBestEvaluatedMove(const std::vector<Move>& moves,
-                                            int iterations,
-                                            int maxForwardMoves,
-                                            int maxMoveCheck,
-                                            float maxPonderTime) {
+Prediction MonteCarloPlayer::evaluateBoardRec(const Board& board) {
+    std::vector<Move> moves = board.getAllMoves(Hand(*this));
     if(moves.empty()) {
-        throw std::runtime_error(std::string("MonteCarlo Player : No moves to play"));
+        return{Move(), 0};
     }
-
-    if(maxMoveCheck <= 0) maxMoveCheck = moves.size();
 
     Prediction bestMove(moves[0]);
 
-    for(int i = 0 ; i < maxMoveCheck ; ++i) {
-        Prediction pred = evaluateMove(moves[i], iterations, maxForwardMoves, maxPonderTime);
+    for(const Move & move : moves) {
+        Board simBoard(board); // Copying the board
+        playMove(simBoard, move, false);
+
+        Prediction pred = evaluateBoardRec(simBoard);
         if(pred.possiblePoints > bestMove.possiblePoints) bestMove = pred;
     }
 
-    return bestMove.move;
+    // Return player points after playing on this board
+    return bestMove;
+}
+
+Move MonteCarloPlayer::getBestEvaluatedMove(const Board& board) {
+    Bag bagSave(bag); // Copying the bag
+    Move bestMove = evaluateBoardRec(board).move;
+    bag = bagSave;
+
+    return bestMove;
 }
 
 bool MonteCarloPlayer::playBestMove(Board& board, bool verbose) {
-    Move bestMove = getBestEvaluatedMove(board.getAllMoves(Hand(*this)), 10);
+    Move bestMove = getBestEvaluatedMove(board);
 
     if(verbose) {
         std::cout << "Playing Big Brain move : " << std::endl;
