@@ -217,7 +217,7 @@ void Board::applyBonusPoints(Move& move) const {
     move.points *= wordMultiplier;
 
     // Scrabble !
-    if(letterUsed >= 7) move.points += 50;
+    if(letterUsed == HAND_SIZE) move.points += 50;
 }
 
 void Board::sortMoveByPoints(std::vector<Move>& moves) const {
@@ -239,7 +239,7 @@ void Board::checkForWords(const Hand& hand,
         const Spot& spot = board[top.position.x][top.position.y];
         const unsigned int shift = top.foundPlus ? 1 : -1;
 
-        if(spot.isEmpty()) { // Spot is empty
+        if(spot.isEmpty()) {
             // We found a correct word
             if(top.node->isTerminal) {
                 Position nextPos = direction

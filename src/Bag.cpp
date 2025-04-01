@@ -9,6 +9,18 @@
 #include <random>
 
 Bag::Bag() : letters(nullptr), size(0) {
+    init();
+}
+
+Bag::~Bag() {
+    delete[] letters;
+}
+
+void Bag::init() {
+    delete[] letters;
+    letters = nullptr;
+    size = 0;
+
     unsigned int totalLetters = 0;
     for(unsigned int letterCount : letterCounts) {
         totalLetters += letterCount;
@@ -34,10 +46,6 @@ Bag::Bag() : letters(nullptr), size(0) {
     for(int i = size - 1 ; i > 0 ; --i) {
         std::swap(letters[i], letters[std::uniform_int_distribution<int>(0, i)(rng)]);
     }
-}
-
-Bag::~Bag() {
-    delete[] letters;
 }
 
 char Bag::drawLetter() {
