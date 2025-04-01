@@ -15,14 +15,7 @@ Node::Node(const char value, const bool isTerminal) : value(value), isTerminal(i
     }
 }
 
-Node*& Node::operator[](char letter) {
-    if(letter >= 'A' && letter <= 'Z') { return children[letter - 'A']; }
-    if(letter == '+') { return children[ALPHABET_SIZE]; }
-
-    throw std::runtime_error("NOPE x(");
-}
-
-Node*& Node::getChild(char letter) {
+Node*& Node::child(char letter) {
     if(letter >= 'A' && letter <= 'Z') { return children[letter - 'A']; }
     if(letter == '+') { return children[ALPHABET_SIZE]; }
 
@@ -63,7 +56,7 @@ void Dictionary::insertWord(const std::string& word) {
             l += 'A' - 'a';
         }
 
-        Node*& child = current->getChild(l);
+        Node*& child = current->child(l);
         if(child == nullptr) {
             child = new Node(l, false);
         }
@@ -89,7 +82,7 @@ bool Dictionary::containWord(const std::string& word) const {
     Node* current = root;
 
     for(char l : word) {
-        Node* child = current->getChild(l);
+        Node* child = current->child(l);
 
         if(child == nullptr) {
             return false;
