@@ -14,8 +14,6 @@
  * @brief
  */
 struct State {
-    State(const Position& position, Node* node, const std::string& word, const Hand& hand);
-
     State(const Position& position, Node* node, const std::string& word, const Hand& hand, bool foundPlus);
 
     Position position;

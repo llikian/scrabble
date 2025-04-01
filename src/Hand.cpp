@@ -22,8 +22,7 @@ Hand::Hand(const Hand& hand) : capacity(hand.capacity) {
 Hand::Hand(const Hand& hand, unsigned int removedLetterIndex) : capacity(0) {
     for(unsigned int i = 0 ; i < hand.capacity ; ++i) {
         if(i != removedLetterIndex) {
-            letters[capacity] = hand.letters[i];
-            capacity++;
+            letters[capacity++] = hand.letters[i];
         }
     }
 }

@@ -19,8 +19,7 @@ struct Node {
 
     ~Node();
 
-    Node*& operator[](char letter);
-    Node*& getChild(char letter);
+    Node*& child(char letter);
 
 private:
     Node* children[ALPHABET_SIZE + 1]; // +1 for '+' character

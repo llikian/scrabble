@@ -44,8 +44,6 @@ Application::Application()
 
     SDL_SetWindowMinimumSize(window, width, height);
     handleResize();
-
-    player.playBestMove(board);
 }
 
 Application::~Application() {
@@ -169,6 +167,12 @@ void Application::handleInputs(SDL_Scancode scancode) {
         case SDL_SCANCODE_SPACE:
             if(!keysFlags[scancode]) {
                 board.getAllMoves(Hand(player));
+                keysFlags.at(scancode) = true;
+            }
+            break;
+        case SDL_SCANCODE_Q:
+            if(!keysFlags[scancode]) {
+                while(player.playBestMove(board, verbose)) { }
                 keysFlags.at(scancode) = true;
             }
             break;
