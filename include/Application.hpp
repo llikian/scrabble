@@ -68,4 +68,6 @@ private:
 
     SDL_Point boardStart;
     int squareLength;
+
+    bool verbose;
 };

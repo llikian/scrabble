@@ -12,7 +12,7 @@
 #include "Player.hpp"
 
 int main() {
-    for(unsigned int boards = 0 ; boards < 10 ; ++boards) {
+    for(unsigned int boards = 0 ; boards < 100 ; ++boards) {
         Dictionary dictionary("data/dico.txt");
         Bag bag;
         Player player(bag);

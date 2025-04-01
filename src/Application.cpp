@@ -16,7 +16,8 @@ Application::Application()
       dictionary("data/dico.txt"),
       board(bag, dictionary),
       player(bag),
-      squareLength(0) {
+      squareLength(0),
+      verbose(true) {
     if(SDL_Init(SDL_INIT_VIDEO) != 0) {
         throw std::runtime_error(std::string("SDL_Init failed: ").append(SDL_GetError()));
     }
@@ -171,11 +172,58 @@ void Application::handleInputs(SDL_Scancode scancode) {
                 keysFlags.at(scancode) = true;
             }
             break;
+        case SDL_SCANCODE_L:
+            if(!keysFlags[scancode]) {
+                std::cout << "\nliris.cnrs.fr/vincent.nivoliers/scrabble.php?board=";
+                for(unsigned int i = 0 ; i < BOARD_SIZE ; ++i) {
+                    for(unsigned int j = 0 ; j < BOARD_SIZE ; ++j) {
+                        const Spot& spot = board.board[i][j];
+                        if(spot.isEmpty()) {
+                            std::cout << '.';
+                        } else {
+                            std::cout << spot.character;
+                        }
+                    }
+                }
+                std::cout << "&rack=";
+                for(unsigned int i = 0 ; i < player.capacity ; ++i) { std::cout << player.hand[i]; }
+                std::cout << '\n';
+                keysFlags.at(scancode) = true;
+            }
+            break;
+        case SDL_SCANCODE_M:
+            if(!keysFlags[scancode]) {
+                std::vector<Move> moves = board.getAllMoves(Hand(player));
+                if(!moves.empty()) {
+                    unsigned int points = moves[0].points;
+                    std::cout << "\nAll possible best moves (" << points << "pts)\n";
+                    unsigned int i = 0;
+                    while(i < moves.size() && moves[i].points == points) {
+                        std::cout << '\t' << moves[i].word << '\n';
+                        ++i;
+                    }
+                }
+                keysFlags.at(scancode) = true;
+            }
+            break;
         case SDL_SCANCODE_R:
             if(!keysFlags[scancode]) {
-                if(!player.playBestMove(board)) {
+                if(!player.playBestMove(board, verbose)) {
                     std::cout << "No moves were found.\n";
                 }
+                keysFlags.at(scancode) = true;
+            }
+            break;
+        case SDL_SCANCODE_S:
+            if(!keysFlags[scancode]) {
+                board.saveToFile("data/saved_board.txt");
+                std::cout << "Saving the current board...\n";
+                keysFlags.at(scancode) = true;
+            }
+            break;
+        case SDL_SCANCODE_V:
+            if(!keysFlags[scancode]) {
+                verbose = !verbose;
                 keysFlags.at(scancode) = true;
             }
             break;

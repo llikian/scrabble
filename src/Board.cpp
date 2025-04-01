@@ -176,20 +176,17 @@ void Board::applyBonusPoints(Move& move) const {
             return;
         }
 
-        if(!currentSpot.isEmpty()) {
-            //If it's not a new character from this move, don't apply bonus
-            move.points += Bag::getPoints(move.word[i]);
-        } else {
+        if(currentSpot.isEmpty()) {
             // Apply bonus of the spot
             switch(currentSpot.type) {
                 case BonusType::None:
                     move.points += Bag::getPoints(move.word[i]);
                     break;
                 case BonusType::LetterX2:
-                    move.points += (Bag::getPoints(move.word[i]) * 2);
+                    move.points += Bag::getPoints(move.word[i]) * 2;
                     break;
                 case BonusType::LetterX3:
-                    move.points += (Bag::getPoints(move.word[i]) * 3);
+                    move.points += Bag::getPoints(move.word[i]) * 3;
                     break;
                 case BonusType::WordX2:
                     move.points += Bag::getPoints(move.word[i]);
@@ -203,6 +200,9 @@ void Board::applyBonusPoints(Move& move) const {
 
             letterUsed++;
             move.points += adjacentWordPoints; // Only take crossing word point if it is created with a new letter
+        } else {
+            //If it's not a new character from this move, don't apply bonus
+            move.points += Bag::getPoints(move.word[i]);
         }
 
         // Move on board in wanted direction
