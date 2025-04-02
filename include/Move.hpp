@@ -18,7 +18,6 @@ struct Move {
     Direction direction;
     std::string word; // Word as it is in the gaddag
     unsigned int points;
-
 };
 
 bool operator>(const Move& m1, const Move& m2);

@@ -111,9 +111,9 @@ bool Player::playBestMove(Board& board, bool verbose) {
     return true;
 }
 
-Prediction MonteCarloPlayer::evaluateBoardRec(const Board& board, int maxMoveCheck) {
+Prediction MonteCarloPlayer::evaluateBoardRec(const Board& board, int maxMoveCheck, int maxForwardMoves) {
     std::vector<Move> moves = board.getAllMoves(Hand(*this));
-    if(moves.empty()) {
+    if(maxForwardMoves <= 0 || moves.empty()) {
         return{Move(), points};
     }
 
@@ -134,7 +134,7 @@ Prediction MonteCarloPlayer::evaluateBoardRec(const Board& board, int maxMoveChe
 
         playMove(simBoard, moves[i], false);
 
-        Prediction pred = evaluateBoardRec(simBoard, maxMoveCheck); //Todo infinite loop ?
+        Prediction pred = evaluateBoardRec(simBoard, maxMoveCheck, maxForwardMoves - 1); //Todo infinite loop ?
         if(pred.possiblePoints > bestMove.possiblePoints) {
             bestMove.move = moves[i];
             bestMove.possiblePoints = pred.possiblePoints;
@@ -150,13 +150,22 @@ Prediction MonteCarloPlayer::evaluateBoardRec(const Board& board, int maxMoveChe
     return bestMove;
 }
 
-Move MonteCarloPlayer::getBestEvaluatedMove(const Board& board) {
-    Move bestMove = evaluateBoardRec(board, 5).move;
+Move MonteCarloPlayer::getBestEvaluatedMove(const Board& board, int maxMoveCheck, int maxForwardMove, int iterations) {
+    Move bestMove;
+    bestMove.points = 0;
+
+    for (int i = 0; i < iterations; ++i)
+    {
+        Move move = evaluateBoardRec(board, maxMoveCheck, maxForwardMove).move;
+        if (move.points > bestMove.points)
+            bestMove = move;
+    }
     return bestMove;
 }
 
 bool MonteCarloPlayer::playBestMove(Board& board, bool verbose) {
-    Move bestMove = getBestEvaluatedMove(board);
+    Move bestMove = getBestEvaluatedMove(board,3 ,3, 1);
+    if (bestMove.points <= 0) return false;
 
     if(verbose) {
         std::cout << "Playing Big Brain move : " << std::endl;
