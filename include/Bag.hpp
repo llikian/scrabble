@@ -15,11 +15,10 @@
 struct Bag {
 public:
     Bag();
-    Bag(const Bag& bag);
     ~Bag();
 
     void init();
-
+    void copy(const Bag& bag);
     char drawLetter();
 
     static unsigned int getPoints(char letter);

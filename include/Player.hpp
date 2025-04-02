@@ -40,7 +40,7 @@ struct Prediction {
 struct MonteCarloPlayer : Player {
     using Player::Player;
 
-    Prediction evaluateBoardRec(const Board& board);
+    Prediction evaluateBoardRec(const Board& board, int maxMoveCheck);
     Move getBestEvaluatedMove(const Board& board);
 
     bool playBestMove(Board& board, bool verbose) override;

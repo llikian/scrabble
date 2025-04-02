@@ -111,7 +111,7 @@ bool Player::playBestMove(Board& board, bool verbose) {
     return true;
 }
 
-Prediction MonteCarloPlayer::evaluateBoardRec(const Board& board) {
+Prediction MonteCarloPlayer::evaluateBoardRec(const Board& board, int maxMoveCheck) {
     std::vector<Move> moves = board.getAllMoves(Hand(*this));
     if(moves.empty()) {
         return{Move(), points};
@@ -119,27 +119,31 @@ Prediction MonteCarloPlayer::evaluateBoardRec(const Board& board) {
 
     Prediction bestMove(moves[0]);
 
-    Bag bagSave(bag); // TODO /!\ a la même adresse mémoire que bag
+    Bag bagSave;
+    bagSave.copy(bag);
 
     char tmpHand[HAND_SIZE];
+    int tmpCapacity = capacity;
     std::copy(std::begin(hand), std::end(hand), std::begin(tmpHand));
 
     int tmpPoints = points;
 
-    for(const Move & move : moves) {
+    //for(const Move & move : moves) {
+    for (int i = 0; i < std::min(maxMoveCheck,static_cast<int>(moves.size())); ++i) {
         Board simBoard(board); // Copying the board
 
-        playMove(simBoard, move, false);
+        playMove(simBoard, moves[i], false);
 
-        Prediction pred = evaluateBoardRec(simBoard);
+        Prediction pred = evaluateBoardRec(simBoard, maxMoveCheck); //Todo infinite loop ?
         if(pred.possiblePoints > bestMove.possiblePoints) {
-            bestMove.move = move;
+            bestMove.move = moves[i];
             bestMove.possiblePoints = pred.possiblePoints;
         }
 
-        bag = bagSave; // TODO Ne remet pas bien le sac
+        bag.copy(bagSave);
         points = tmpPoints;
         std::copy(std::begin(tmpHand), std::end(tmpHand), std::begin(hand));
+        capacity = tmpCapacity;
     }
 
     // Return player points after playing on this board
@@ -147,8 +151,7 @@ Prediction MonteCarloPlayer::evaluateBoardRec(const Board& board) {
 }
 
 Move MonteCarloPlayer::getBestEvaluatedMove(const Board& board) {
-    Move bestMove = evaluateBoardRec(board).move;
-
+    Move bestMove = evaluateBoardRec(board, 5).move;
     return bestMove;
 }
 

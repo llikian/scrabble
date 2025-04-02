@@ -12,11 +12,18 @@ Bag::Bag() : letters(nullptr), size(0) {
     init();
 }
 
-Bag::Bag(const Bag& bag): letters(bag.letters), size(bag.size) {} // TODO copy bag and not reference it
-
 Bag::~Bag() {
     delete[] letters;
 }
+
+void Bag::copy(const Bag& bag) {
+    size = bag.size;
+    letters = new char[size];
+    for (int i=0; i<size; i++) {
+        letters[i] = bag.letters[i];
+    }
+}
+
 
 void Bag::init() {
     delete[] letters;
