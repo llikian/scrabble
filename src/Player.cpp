@@ -21,7 +21,7 @@ void Player::init() {
     }
 }
 
-void Player::refreshHand(const std::string& usedLetters) {
+void Player::refreshHand(const std::string& usedLetters) { // TODO Very sus
     for(char used_letter : usedLetters) {
         for(char& c : hand) {
             if(c == used_letter) {
@@ -114,17 +114,32 @@ bool Player::playBestMove(Board& board, bool verbose) {
 Prediction MonteCarloPlayer::evaluateBoardRec(const Board& board) {
     std::vector<Move> moves = board.getAllMoves(Hand(*this));
     if(moves.empty()) {
-        return{Move(), 0};
+        return{Move(), points};
     }
 
     Prediction bestMove(moves[0]);
 
+    Bag bagSave(bag); // TODO /!\ a la même adresse mémoire que bag
+
+    char tmpHand[HAND_SIZE];
+    std::copy(std::begin(hand), std::end(hand), std::begin(tmpHand));
+
+    int tmpPoints = points;
+
     for(const Move & move : moves) {
         Board simBoard(board); // Copying the board
+
         playMove(simBoard, move, false);
 
         Prediction pred = evaluateBoardRec(simBoard);
-        if(pred.possiblePoints > bestMove.possiblePoints) bestMove = pred;
+        if(pred.possiblePoints > bestMove.possiblePoints) {
+            bestMove.move = move;
+            bestMove.possiblePoints = pred.possiblePoints;
+        }
+
+        bag = bagSave; // TODO Ne remet pas bien le sac
+        points = tmpPoints;
+        std::copy(std::begin(tmpHand), std::end(tmpHand), std::begin(hand));
     }
 
     // Return player points after playing on this board
@@ -132,9 +147,7 @@ Prediction MonteCarloPlayer::evaluateBoardRec(const Board& board) {
 }
 
 Move MonteCarloPlayer::getBestEvaluatedMove(const Board& board) {
-    Bag bagSave(bag); // Copying the bag
     Move bestMove = evaluateBoardRec(board).move;
-    bag = bagSave;
 
     return bestMove;
 }

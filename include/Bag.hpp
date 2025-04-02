@@ -15,6 +15,7 @@
 struct Bag {
 public:
     Bag();
+    Bag(const Bag& bag);
     ~Bag();
 
     void init();

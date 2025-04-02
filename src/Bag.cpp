@@ -12,6 +12,8 @@ Bag::Bag() : letters(nullptr), size(0) {
     init();
 }
 
+Bag::Bag(const Bag& bag): letters(bag.letters), size(bag.size) {} // TODO copy bag and not reference it
+
 Bag::~Bag() {
     delete[] letters;
 }
