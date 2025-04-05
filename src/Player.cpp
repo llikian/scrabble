@@ -113,40 +113,46 @@ bool Player::playBestMove(Board& board, bool verbose) {
 
 Prediction MonteCarloPlayer::evaluateBoardRec(const Board& board, int maxMoveCheck, int maxForwardMoves) {
     std::vector<Move> moves = board.getAllMoves(Hand(*this));
+
+    // Stop recursion if there is no move or maxForward move is reached
     if(maxForwardMoves <= 0 || moves.empty()) {
         return{Move(), points};
     }
 
-    Prediction bestMove(moves[0]);
-
+    // Save player and bag state
     Bag bagSave;
     bagSave.copy(bag);
-
     char tmpHand[HAND_SIZE];
     int tmpCapacity = capacity;
     std::copy(std::begin(hand), std::end(hand), std::begin(tmpHand));
-
     int tmpPoints = points;
 
-    //for(const Move & move : moves) {
-    for (int i = 0; i < std::min(maxMoveCheck,static_cast<int>(moves.size())); ++i) {
-        Board simBoard(board); // Copying the board
+    Prediction bestMove(moves[0]);
 
+    // For each possible move in the limit of moxMoveCheck
+    for (int i = 0; i < std::min(maxMoveCheck,static_cast<int>(moves.size())); ++i) {
+
+        // Copying the board and playing the move on it
+        Board simBoard(board);
         playMove(simBoard, moves[i], false);
 
-        Prediction pred = evaluateBoardRec(simBoard, maxMoveCheck, maxForwardMoves - 1); //Todo infinite loop ?
+        // Recursion on the new board
+        Prediction pred = evaluateBoardRec(simBoard, maxMoveCheck, maxForwardMoves - 1);
+
+        // If the recursion give mor points, keep this move
         if(pred.possiblePoints > bestMove.possiblePoints) {
             bestMove.move = moves[i];
             bestMove.possiblePoints = pred.possiblePoints;
         }
 
+        // Set player back to initial state
         bag.copy(bagSave);
         points = tmpPoints;
         std::copy(std::begin(tmpHand), std::end(tmpHand), std::begin(hand));
         capacity = tmpCapacity;
     }
 
-    // Return player points after playing on this board
+    // Return the best potential move with its potential points
     return bestMove;
 }
 
@@ -154,6 +160,7 @@ Move MonteCarloPlayer::getBestEvaluatedMove(const Board& board, int maxMoveCheck
     Move bestMove;
     bestMove.points = 0;
 
+    // Make multiple iterations to smooth the variance
     for (int i = 0; i < iterations; ++i)
     {
         Move move = evaluateBoardRec(board, maxMoveCheck, maxForwardMove).move;
@@ -165,10 +172,12 @@ Move MonteCarloPlayer::getBestEvaluatedMove(const Board& board, int maxMoveCheck
 
 bool MonteCarloPlayer::playBestMove(Board& board, bool verbose) {
     Move bestMove = getBestEvaluatedMove(board,3 ,3, 1);
+
+    // No moves to play
     if (bestMove.points <= 0) return false;
 
     if(verbose) {
-        std::cout << "Playing Big Brain move : " << std::endl;
+        std::cout << "Playing Montecarlo move : " << std::endl;
         std::cout << (bestMove.direction ? "[V] " : "[H] ");
         std::cout << '(' << bestMove.start.x << ", " << bestMove.start.y << ") ";
         std::cout << bestMove.word << " : " << bestMove.points << " points" << '\n';
