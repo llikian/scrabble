@@ -214,7 +214,7 @@ void Application::handleInputs(SDL_Scancode scancode) {
             break;
         case SDL_SCANCODE_P:
             if(!keysFlags[scancode]) {
-                board.getAllMoves(Hand(player));
+                board.getAllMoves(Hand(player), true);
                 keysFlags.at(scancode) = true;
             }
             break;
