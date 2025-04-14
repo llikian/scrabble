@@ -1,6 +1,8 @@
-# Template
-## Project Description
-
+# Project Scrabble
+## Description
+The goal of this project is to program an automatic Scrabble player, 
+which will determine the move that scores the most points given a game board, 
+the player's set of letters, and a dictionary.
 
 ## Setup
 ### Dependencies
@@ -31,5 +33,12 @@ Then you can run it using:
 ```shell
 bin/Template
 ```
+## Usage
+
+
 
 ## Credits
+Killian POULETTE 12200001<br/>
+Samuel BIBAS 12102474
+
+This project has been made in the context of LIFAPC : https://forge.univ-lyon1.fr/lifap6/scrabble-etu
