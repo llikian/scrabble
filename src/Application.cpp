@@ -201,11 +201,13 @@ void Application::handleInputs(SDL_Scancode scancode) {
         case SDL_SCANCODE_M:
             if(!keysFlags[scancode]) {
                 std::vector<Move> moves = board.getAllMoves(Hand(player));
-                std::unordered_set<std::string> seenWords;
 
                 if(!moves.empty()) {
+                    std::unordered_set<std::string> seenWords;
+
                     unsigned int points = moves[0].points;
-                    std::cout << "\nAll possible best moves (" << points << "pts)\n";
+                    std::cout << "\nAll possible best moves (" << points << "pts):\n";
+
                     unsigned int i = 0;
                     while(i < moves.size() && moves[i].points == points) {
                         const std::string& word = moves[i++].word;
