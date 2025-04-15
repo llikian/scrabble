@@ -111,6 +111,11 @@ bool Player::playBestMove(Board& board, bool verbose) {
     return true;
 }
 
+void Player::setHand(char hand[7], unsigned int capacity) {
+    this->capacity = capacity;
+    for(unsigned int i = 0 ; i < capacity ; ++i) { this->hand[i] = hand[i]; }
+}
+
 Prediction MonteCarloPlayer::evaluateBoardRec(const Board& board, int maxMoveCheck, int maxForwardMoves) {
     std::vector<Move> moves = board.getAllMoves(Hand(*this));
 

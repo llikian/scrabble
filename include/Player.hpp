@@ -28,10 +28,7 @@ struct Player {
     void playMove(Board& board, const Move& move, bool verbose);
     virtual bool playBestMove(Board& board, bool verbose = true);
 
-    void setHand(char hand[HAND_SIZE], unsigned int capacity) {
-        this->capacity = capacity;
-        for(unsigned int i = 0 ; i < capacity ; ++i) { this->hand[i] = hand[i]; }
-    }
+    void setHand(char hand[HAND_SIZE], unsigned int capacity);
 };
 
 struct Prediction {
