@@ -19,7 +19,7 @@ struct Player {
     Bag& bag;
     char hand[HAND_SIZE];
     unsigned int capacity;
-    int points;
+    unsigned int points;
 
     void init();
 

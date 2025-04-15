@@ -201,7 +201,7 @@ void Board::applyBonusPoints(Move& move) const {
             letterUsed++;
             move.points += adjacentWordPoints; // Only take crossing word point if it is created with a new letter
         } else {
-            //If it's not a new character from this move, don't apply bonus
+            // If it's not a new character from this move, don't apply bonus
             move.points += Bag::getPoints(move.word[i]);
         }
 
@@ -214,10 +214,11 @@ void Board::applyBonusPoints(Move& move) const {
             spotPos.y += !move.direction;
         }
     }
+
     move.points *= wordMultiplier;
 
     // Scrabble !
-    if(letterUsed == HAND_SIZE) move.points += 50;
+    if(letterUsed == HAND_SIZE) { move.points += 50; }
 }
 
 void Board::sortMoveByPoints(std::vector<Move>& moves) const {
