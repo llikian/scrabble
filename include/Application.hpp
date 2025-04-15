@@ -64,7 +64,7 @@ private:
     Dictionary dictionary;
     Bag bag;
     Board board;
-    MonteCarloPlayer player;
+    Player player;
 
     SDL_Point boardStart;
     int squareLength;

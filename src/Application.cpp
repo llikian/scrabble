@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <stdexcept>
+#include <unordered_set>
 
 Application::Application()
     : window(nullptr), renderer(nullptr), font(nullptr),
@@ -200,13 +201,19 @@ void Application::handleInputs(SDL_Scancode scancode) {
         case SDL_SCANCODE_M:
             if(!keysFlags[scancode]) {
                 std::vector<Move> moves = board.getAllMoves(Hand(player));
+                std::unordered_set<std::string> seenWords;
+
                 if(!moves.empty()) {
                     unsigned int points = moves[0].points;
                     std::cout << "\nAll possible best moves (" << points << "pts)\n";
                     unsigned int i = 0;
                     while(i < moves.size() && moves[i].points == points) {
-                        std::cout << '\t' << moves[i].word << '\n';
-                        ++i;
+                        const std::string& word = moves[i++].word;
+
+                        if(seenWords.contains(word)) { continue; }
+                        seenWords.emplace(word);
+
+                        std::cout << '\t' << word << " (" << Dictionary::getWordFromGaddagWord(word) << ")\n";
                     }
                 }
                 keysFlags.at(scancode) = true;
