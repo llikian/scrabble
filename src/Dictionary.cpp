@@ -48,25 +48,6 @@ Dictionary::~Dictionary() {
     delete root;
 }
 
-void Dictionary::insertWord(const std::string& word) {
-    Node* current = root;
-
-    for(char l : word) {
-        if(l >= 'a' && l <= 'z') {
-            l += 'A' - 'a';
-        }
-
-        Node*& child = current->child(l);
-        if(child == nullptr) {
-            child = new Node(l, false);
-        }
-
-        current = child;
-    }
-
-    current->isTerminal = true;
-}
-
 void Dictionary::insertGADDAGWord(const std::string& word) {
     std::string gaddagWord = '+' + word;
 
@@ -92,4 +73,33 @@ bool Dictionary::containWord(const std::string& word) const {
     }
 
     return current->isTerminal;
+}
+
+std::string Dictionary::getWordFromGaddagWord(const std::string& gaddagWord) {
+    std::string word;
+
+    unsigned int plusIndex = gaddagWord.find_first_of('+');
+    for(int i = plusIndex - 1 ; i >= 0 ; --i) { word += gaddagWord[i]; }
+    for(unsigned int i = plusIndex + 1 ; i < gaddagWord.size() ; ++i) { word += gaddagWord[i]; }
+
+    return word;
+}
+
+void Dictionary::insertWord(const std::string& word) {
+    Node* current = root;
+
+    for(char l : word) {
+        if(l >= 'a' && l <= 'z') {
+            l += 'A' - 'a';
+        }
+
+        Node*& child = current->child(l);
+        if(child == nullptr) {
+            child = new Node(l, false);
+        }
+
+        current = child;
+    }
+
+    current->isTerminal = true;
 }

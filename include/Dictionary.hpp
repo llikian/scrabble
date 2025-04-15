@@ -40,15 +40,7 @@ public:
     void insertGADDAGWord(const std::string& word);
     bool containWord(const std::string& word) const;
 
-    static std::string getWordFromGaddagWord(const std::string& gaddagWord) {
-        std::string word;
-
-        unsigned int plusIndex = gaddagWord.find_first_of('+');
-        for(int i = plusIndex - 1 ; i >= 0 ; --i) { word += gaddagWord[i]; }
-        for(unsigned int i = plusIndex + 1 ; i < gaddagWord.size() ; ++i) { word += gaddagWord[i]; }
-
-        return word;
-    }
+    static std::string getWordFromGaddagWord(const std::string& gaddagWord);
 
     static void unitTests();
 
